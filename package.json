@@ -3,7 +3,10 @@
   "version": "0.0.0-dev",
   "description": "A tiny HTTP server.",
   "private": true,
-  "main": "lib/main.js",
+  "engines": {
+    "node": ">=6.5.0",
+    "npm": ">=3.10.0"
+  },
   "scripts": {
     "test": "ts-node -P . -C typescript node_modules/.bin/tape src/**/*.test.ts | node_modules/.bin/tap-diff",
     "lint": "tslint -c ./tslint.json ./src/**/*.ts*",
