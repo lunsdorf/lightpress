@@ -4,6 +4,7 @@
   "description": "A tiny HTTP server.",
   "private": true,
   "main": "lib/main.js",
+  "typings": "lib/main.d.ts",
   "engines": {
     "node": ">=6.5.0",
     "npm": ">=3.10.0"
@@ -12,8 +13,7 @@
     "test": "ts-node -P . -C typescript node_modules/.bin/tape src/**/*.test.ts | node_modules/.bin/tap-diff",
     "lint": "tslint -c ./tslint.json ./src/**/*.ts*",
     "qa": "npm run lint && npm run test",
-    "build": "rimraf ./lib && npm run qa && tsc --project ./tsconfig.json",
-    "dts": "echo \"Error: no dts generator not setup yet\" && exit 1"
+    "build": "rimraf ./lib && npm run qa && tsc --project ./tsconfig.json"
   },
   "repository": {
     "type": "git",
