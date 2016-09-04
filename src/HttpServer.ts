@@ -1,7 +1,8 @@
 import * as http from "http";
 import * as https from "https";
 import * as path from "path";
-import {Readable} from "stream";
+import * as zlib from "zlib";
+import {Readable, Transform} from "stream";
 import {parse, Url} from "url";
 
 import HttpError from "./HttpError";
@@ -54,6 +55,11 @@ export default class HttpServer implements IHttpHandler {
    * Internal storage for registered HTTP handlers.
    */
   private httpHandlers: [string, number, IHttpHandler][] = [];
+
+  /**
+   * The number of concurrent requests.
+   */
+  private encodingRe: RegExp = /(deflate|gzip)/;
 
   /**
    * The `HttpServer` can be bound to node's HTTP/HTTPS server's `request`
@@ -129,8 +135,12 @@ export default class HttpServer implements IHttpHandler {
    * @param result The data to send to the client.
    */
   private sendResult (request: http.IncomingMessage, response: http.ServerResponse, result: IHttpResult): void {
-    if (!(result.headers && result.headers["Content-Encoding"]) && false /* FIXME: test agent encoding here */) {
-      // TODO: check encoding support and encode result
+    if (result.data && !(result.headers && result.headers["Content-Encoding"]) && request.headers["accept-encoding"]) {
+      const match = request.headers["accept-encoding"].match(this.encodingRe);
+
+      if (match) {
+        result = this.encodeResult(match[1], result);
+      }
     }
 
     if (result.headers) {
@@ -169,6 +179,33 @@ export default class HttpServer implements IHttpHandler {
 
     rs.push(JSON.stringify(httpError));
     rs.push(null);
+  }
+
+  private encodeResult (format: string, result: IHttpResult): IHttpResult {
+    let compressor: zlib.Gzip|zlib.Deflate;
+
+    switch (format) {
+      case "gzip":
+        compressor = zlib.createGzip();
+        break;
+      case "defalte":
+        compressor = zlib.createDeflate();
+        break;
+      default:
+        return result;
+    }
+
+    if (result.headers) {
+      delete result.headers["Content-Length"];
+      delete result.headers["content-length"];
+    } else {
+      result.headers = {};
+    }
+
+    result.headers["Content-Encoding"] = format;
+    result.data = result.data.pipe<Transform>(compressor);
+
+    return result;
   }
 
   /**

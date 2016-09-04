@@ -1,4 +1,4 @@
-import * as stream from "stream";
+import {Readable, Transform} from "stream";
 
 import {HttpHeaders} from "./HttpHeaders";
 
@@ -20,5 +20,5 @@ export interface IHttpResult {
   /**
    * Additional payload data to send to the requesting client.
    */
-  data?: stream.Readable;
+  data?: Readable|Transform;
 }
