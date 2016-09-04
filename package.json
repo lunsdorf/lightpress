@@ -12,7 +12,7 @@
     "test": "ts-node -P . -C typescript node_modules/.bin/tape src/**/*.test.ts | node_modules/.bin/tap-diff",
     "lint": "tslint -c ./tslint.json ./src/**/*.ts*",
     "qa": "npm run lint && npm run test",
-    "build": "tsc --project ./tsconfig.json",
+    "build": "rimraf ./lib && npm run qa && tsc --project ./tsconfig.json",
     "dts": "echo \"Error: no dts generator not setup yet\" && exit 1"
   },
   "repository": {
@@ -32,6 +32,7 @@
   "devDependencies": {
     "@types/node": "^6.0.38",
     "@types/tape": "^4.2.27",
+    "rimraf": "^2.5.4",
     "tap-diff": "^0.1.1",
     "tape": "^4.6.0",
     "ts-node": "^1.3.0",
