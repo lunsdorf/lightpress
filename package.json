@@ -1,8 +1,7 @@
 {
   "name": "lightpress",
-  "version": "0.0.2-dev",
+  "version": "0.0.2",
   "description": "A tiny HTTP server.",
-  "private": true,
   "main": "lib/main.js",
   "typings": "lib/main.d.ts",
   "engines": {
