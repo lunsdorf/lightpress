@@ -14,14 +14,16 @@ test("The `HttpError` instance", t => {
   const e1: HttpError = new HttpError(code);
   const e2: HttpError = new HttpError(code, message);
   const e3: HttpError = HttpError.fromError(new Error(message));
+  const e4: HttpError = HttpError.fromError(new Error(message), 400);
 
   t.ok(e1 instanceof Error, "should be an instance of `Error`");
   t.equal(e1.code, code, "should have the error code passed to the constructor");
   t.equal(e1.message, STATUS_CODES[code], "should default to the corresponding HTTP message");
   t.equal(e2.message, message, "should have the error message passed to the constructor");
   t.equal(e1, HttpError.fromError(e1), "should not convert an `HttpError`");
-  t.equal(e3.code, 500, "should have error code `500` when converted from a non `HttpError`");
+  t.equal(e3.code, 500, "should have default code `500` when converted from non `HttpError`");
   t.equal(e3.message, message, "should have the error message from the given error when converted");
+  t.equal(e4.code, 400, "should have custom code when defined and converted from non `HttpError`");
   t.equal(typeof e2.toJSON, "function", "should be serializable to JSON");
   t.isEquivalent(e2.toJSON(), {code, message, error: true}, "should serialize to the expected JSON object");
   t.end();

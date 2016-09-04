@@ -13,13 +13,15 @@ export default class HttpError extends Error {
 
   /**
    * Converts the given error to an HTTP error instance.
-   * @param error
+   * @param error The error to convert. If this is already an HTTP error
+   * instance, the same reference will be returned without converting it.
+   * @param code The HTTP code for the newly created HTTP error.
    */
-  public static fromError (error: Error): HttpError {
+  public static fromError (error: Error, code = 500): HttpError {
     if (error instanceof HttpError) {
       return error;
     } else {
-      return new HttpError(500, error.message);
+      return new HttpError(code, error.message);
     }
   }
 
