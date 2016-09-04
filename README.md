@@ -1,2 +1,4 @@
-# lightpress
-A tiny HTTP server.
+lightpress
+===============================================================================
+
+> A tiny HTTP server.

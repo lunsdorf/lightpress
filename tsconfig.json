@@ -1,0 +1,23 @@
+{
+  "compilerOptions": {
+    "declaration": true,
+    "isolatedModules": false,
+    "jsx": "react",
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "outDir": "lib/",
+    "preserveConstEnums": true,
+    "removeComments": true,
+    "sourceMap": false,
+    "target": "es2015",
+    "lib": ["es2015"]
+  },
+  "exclude": [
+    "node_modules/",
+    "lib/"
+  ],
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.tsx"
+  ]
+}
