@@ -11,5 +11,5 @@ export interface IHttpHandler {
    * @param request The request that should be handled.
    * @return The outcome of the handled request.
    */
-  serveHttp(request: IHttpRequest): Promise<IHttpResult>;
+  serveHttpAsync(request: IHttpRequest): Promise<IHttpResult>;
 }

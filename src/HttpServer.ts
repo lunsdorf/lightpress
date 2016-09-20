@@ -5,11 +5,11 @@ import * as zlib from "zlib";
 import {Readable, Transform} from "stream";
 import {parse, Url} from "url";
 
-import HttpError from "./HttpError";
 import {IHttpHandler} from "./IHttpHandler";
 import {IHttpResult} from "./IHttpResult";
 import {IHttpRequest} from "./IHttpRequest";
-import {MIME_TYPES} from "./MIME_TYPES";
+import HttpError from "./HttpError";
+import MIME_TYPES from "./MIME_TYPES";
 
 export default class HttpServer implements IHttpHandler {
   /**
@@ -107,7 +107,7 @@ export default class HttpServer implements IHttpHandler {
    * @param request The incoming HTTP request.
    * @return A promise that will be resolved by the delegated HTTP handler.
    */
-  public serveHttp (request: IHttpRequest): Promise<IHttpResult> {
+  public serveHttpAsync (request: IHttpRequest): Promise<IHttpResult> {
     const pathname = request.url.pathname;
     let matchedLength = 0;
     let matchedHandler: IHttpHandler;
@@ -122,7 +122,7 @@ export default class HttpServer implements IHttpHandler {
     }
 
     if (matchedHandler) {
-      return matchedHandler.serveHttp(request);
+      return matchedHandler.serveHttpAsync(request);
     } else {
       return Promise.reject<IHttpResult>(new HttpError(404));
     }
@@ -243,7 +243,7 @@ export default class HttpServer implements IHttpHandler {
       url: url,
     };
 
-    return void this.serveHttp(r)
+    return void this.serveHttpAsync(r)
       .then<void>((rslt: IHttpResult) => this.sendResult(request, response, rslt))
       .catch<void>((err: Error) => this.sendError(request, response, err));
   }

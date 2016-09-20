@@ -4,7 +4,7 @@
  * This list was taken from the apache HTTP server:
  * https://svn.apache.org/repos/asf/httpd/httpd/trunk/docs/conf/mime.types
  */
-export const MIME_TYPES: { [extname: string]: string } = {
+const MIME_TYPES: { [extname: string]: string } = {
   ".ez": "application/andrew-inset",
   ".aw": "application/applixware",
   ".atom": "application/atom+xml",
@@ -987,3 +987,5 @@ export const MIME_TYPES: { [extname: string]: string } = {
   ".smv": "video/x-smv",
   ".ice": "x-conference/x-cooltalk",
 };
+
+export default MIME_TYPES;

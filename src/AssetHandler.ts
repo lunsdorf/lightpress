@@ -1,10 +1,10 @@
 import * as fs from "fs";
 import * as path from "path";
-import HttpError from "./HttpError";
 import {IHttpHandler} from "./IHttpHandler";
 import {IHttpResult} from "./IHttpResult";
 import {IHttpRequest} from "./IHttpRequest";
-import {MIME_TYPES} from "./MIME_TYPES";
+import HttpError from "./HttpError";
+import MIME_TYPES from "./MIME_TYPES";
 
 export default class AssetHandler implements IHttpHandler {
   /**
@@ -34,7 +34,7 @@ export default class AssetHandler implements IHttpHandler {
    * @param request The incoming HTTP request.
    * @return A promise that will be resolved with the requested file.
    */
-  public serveHttp(request: IHttpRequest): Promise<IHttpResult> {
+  public serveHttpAsync(request: IHttpRequest): Promise<IHttpResult> {
     let filepath: string;
 
     try {
