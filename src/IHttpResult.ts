@@ -1,6 +1,6 @@
-import {Readable, Transform} from "stream";
+import { Readable, Transform } from "stream";
 
-import {HttpHeaders} from "./HttpHeaders";
+import { HttpHeaders } from "./HttpHeaders";
 
 /**
  * Interface that represents the outcome of a requested URL. The HTTP result
@@ -20,5 +20,5 @@ export interface IHttpResult {
   /**
    * Additional payload data to send to the requesting client.
    */
-  data?: Readable|Transform;
+  data?: Readable | Transform;
 }

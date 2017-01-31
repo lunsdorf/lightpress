@@ -1,5 +1,5 @@
-import {IncomingMessage} from "http";
-import {Url} from "url";
+import { IncomingMessage } from "http";
+import { Url } from "url";
 
 /**
  * An interface that extends and wraps the native incoming HTTP request.

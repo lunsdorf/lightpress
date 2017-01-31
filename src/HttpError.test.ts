@@ -1,5 +1,5 @@
 import * as test from "tape";
-import {STATUS_CODES} from "http";
+import { STATUS_CODES } from "http";
 
 import HttpError from "./HttpError";
 
@@ -25,6 +25,6 @@ test("The `HttpError` instance", t => {
   t.equal(e3.message, message, "should have the error message from the given error when converted");
   t.equal(e4.code, 400, "should have custom code when defined and converted from non `HttpError`");
   t.equal(typeof e2.toJSON, "function", "should be serializable to JSON");
-  t.isEquivalent(e2.toJSON(), {code, message, error: true}, "should serialize to the expected JSON object");
+  t.isEquivalent(e2.toJSON(), { code, message, error: true }, "should serialize to the expected JSON object");
   t.end();
 });

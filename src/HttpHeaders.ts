@@ -1,1 +1,1 @@
-export type HttpHeaders = { [key: string]: string|string[] }
+export type HttpHeaders = { [key: string]: string | string[] };

@@ -1,8 +1,8 @@
 import * as fs from "fs";
 import * as path from "path";
-import {IHttpHandler} from "./IHttpHandler";
-import {IHttpResult} from "./IHttpResult";
-import {IHttpRequest} from "./IHttpRequest";
+import { IHttpHandler } from "./IHttpHandler";
+import { IHttpResult } from "./IHttpResult";
+import { IHttpRequest } from "./IHttpRequest";
 import HttpError from "./HttpError";
 import MIME_TYPES from "./MIME_TYPES";
 
@@ -23,7 +23,7 @@ export default class AssetHandler implements IHttpHandler {
    * An HTTP handler for serving static files.
    * @param basePath The filesystem path from where to serve the static files.
    */
-  constructor (basePath: string) {
+  constructor(basePath: string) {
     this.basePath = basePath;
   }
 
@@ -55,8 +55,8 @@ export default class AssetHandler implements IHttpHandler {
             data: fs.createReadStream(filepath),
             headers: {
               "Content-Length": stats.size.toString(10),
-              "Content-Type": MIME_TYPES[extname] || MIME_TYPES[".bin"],
-            },
+              "Content-Type": MIME_TYPES[extname] || MIME_TYPES[".bin"]
+            }
           });
         }
       });
@@ -69,7 +69,7 @@ export default class AssetHandler implements IHttpHandler {
    * @param pathname The requested pathname.
    * @return The path to the requested file.
    */
-  private filepath (pathname: string): string {
+  private filepath(pathname: string): string {
     if (0 !== pathname.indexOf(this.baseUrl)) {
       throw new Error("pathname does not match base URL");
     }

@@ -1,5 +1,5 @@
-import {IHttpResult} from "./IHttpResult";
-import {IHttpRequest} from "./IHttpRequest";
+import { IHttpResult } from "./IHttpResult";
+import { IHttpRequest } from "./IHttpRequest";
 
 /**
  * Interface for handling incoming HTTP request.

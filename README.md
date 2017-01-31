@@ -4,6 +4,35 @@ lightpress
 > A tiny HTTP server.
 
 
+Getting Started
+-------------------------------------------------------------------------------
+
+### Installation
+
+```bash
+$ npm install lightpress
+```
+
+### Example
+
+Typescript example to create and bind a server that serves static fiels from the projects `./assets/` directory.
+
+```ts
+import {createServer, Server} from "http";
+import {HttpServer, AssetHandler} from "lightpress";
+
+const http: Server = createServer();
+const app: HttpServer = new HttpServer();
+
+// configure app server
+app.bindHttpListener(http);
+app.handleHttp("/assets/", new AssetHandler("./assets/"));
+
+// listen for HTTP requests
+http.listen(8080);
+```
+
+
 Development
 -------------------------------------------------------------------------------
 

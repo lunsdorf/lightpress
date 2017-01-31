@@ -8,6 +8,6 @@ export * from "./IHttpRequest";
 
 // Export Library Implementation
 export * from "./MIME_TYPES";
-export {default as HttpError} from "./HttpError";
-export {default as HttpServer} from "./HttpServer";
-export {default as AssetHandler} from "./AssetHandler";
+export { default as HttpError } from "./HttpError";
+export { default as HttpServer } from "./HttpServer";
+export { default as AssetHandler } from "./AssetHandler";

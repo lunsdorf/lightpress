@@ -1,4 +1,4 @@
-import {STATUS_CODES} from "http";
+import { STATUS_CODES } from "http";
 
 export default class HttpError extends Error {
   /**
@@ -17,7 +17,7 @@ export default class HttpError extends Error {
    * instance, the same reference will be returned without converting it.
    * @param code The HTTP code for the newly created HTTP error.
    */
-  public static fromError (error: Error, code = 500): HttpError {
+  public static fromError(error: Error, code = 500): HttpError {
     if (error instanceof HttpError) {
       return error;
     } else {
@@ -32,7 +32,7 @@ export default class HttpError extends Error {
    * @param [message] Optional error message. If no message is given, the
    * default message of the given HTTP code is used.
    */
-  constructor (code: number, message?: string) {
+  constructor(code: number, message?: string) {
     super(message || STATUS_CODES[code]);
 
     this.code = code;
@@ -42,11 +42,11 @@ export default class HttpError extends Error {
    * Converts this error to a JSON object.
    * @return The converted JSON object.
    */
-  public toJSON (): any {
+  public toJSON(): any {
     return {
       code: this.code,
       error: true,
-      message: this.message,
+      message: this.message
     };
   }
 }
