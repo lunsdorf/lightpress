@@ -2,13 +2,14 @@ import * as http from "http";
 import * as https from "https";
 import * as path from "path";
 import * as zlib from "zlib";
-import { Readable, Transform } from "stream";
+import { Transform } from "stream";
 import { parse, Url } from "url";
 
 import { IHttpHandler } from "./IHttpHandler";
 import { IHttpResult } from "./IHttpResult";
 import { IHttpRequest } from "./IHttpRequest";
 import HttpError from "./HttpError";
+import StaticStream from "./StaticStream";
 import MIME_TYPES from "./MIME_TYPES";
 
 export default class HttpServer implements IHttpHandler {
@@ -164,20 +165,14 @@ export default class HttpServer implements IHttpHandler {
    */
   protected sendError(request: http.IncomingMessage, response: http.ServerResponse, error: Error): void {
     const httpError: HttpError = HttpError.fromError(error);
-    const rs: Readable = new Readable({
-      read: () => void 0
-    });
 
     this.sendResult(request, response, {
       code: httpError.code,
-      data: rs,
+      data: new StaticStream(JSON.stringify(httpError)),
       headers: {
         "Content-Type": MIME_TYPES[".json"]
       }
     });
-
-    rs.push(JSON.stringify(httpError));
-    rs.push(null);
   }
 
   /**
