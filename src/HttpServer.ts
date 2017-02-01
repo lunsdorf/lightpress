@@ -197,7 +197,7 @@ export default class HttpServer implements IHttpHandler {
       case "gzip":
         compressor = zlib.createGzip();
         break;
-      case "defalte":
+      case "deflate":
         compressor = zlib.createDeflate();
         break;
       default:
