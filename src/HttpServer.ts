@@ -130,8 +130,8 @@ export default class HttpServer implements IHttpHandler {
 
   /**
    * Sends a response to the requesting client.
-   * @param request Node's HTTP request.
-   * @param request Node's HTTP reponse.
+   * @param request Node's HTTP incoming request object.
+   * @param response Node's HTTP server response object.
    * @param result The data to send to the client.
    */
   private sendResult(request: http.IncomingMessage, response: http.ServerResponse, result: IHttpResult): void {
@@ -158,16 +158,15 @@ export default class HttpServer implements IHttpHandler {
 
   /**
    * Sends an error response to the requesting client.
-   * @param request Node's HTTP request.
-   * @param request Node's HTTP reponse.
+   * @param request Node's HTTP incoming request object.
+   * @param response Node's HTTP server response object.
    * @param error The error to send to the client.
    */
   private sendError(request: http.IncomingMessage, response: http.ServerResponse, error: Error): void {
     const httpError: HttpError = HttpError.fromError(error);
-    const rs: Readable = new Readable();
-
-    // NOOP readable stream implementation
-    rs._read = () => void 0;
+    const rs: Readable = new Readable({
+      read: () => void 0
+    });
 
     this.sendResult(request, response, {
       code: httpError.code,
@@ -210,8 +209,8 @@ export default class HttpServer implements IHttpHandler {
 
   /**
    * Event handler for request events emitted by the HTTP/HTTPS server.
-   * @param request Node's HTTP request.
-   * @param request Node's HTTP reponse.
+   * @param request Node's HTTP incoming request object.
+   * @param response Node's HTTP server response object.
    */
   private handleRequest(request: http.IncomingMessage, response: http.ServerResponse): void {
     const timestamp: number = Date.now();
@@ -244,8 +243,8 @@ export default class HttpServer implements IHttpHandler {
     };
 
     return void this.serveHttpAsync(r)
-      .then<void>((rslt: IHttpResult) => this.sendResult(request, response, rslt))
-      .catch<void>((err: Error) => this.sendError(request, response, err));
+      .then<void>((result: IHttpResult) => this.sendResult(request, response, result))
+      .catch<void>((error: Error) => this.sendError(request, response, error));
   }
 
   /**

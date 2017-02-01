@@ -12,7 +12,7 @@
     "build": "rimraf ./lib && npm run qa && tsc --project ./tsconfig.json",
     "lint": "tslint -c ./tslint.json ./src/**/*.ts*",
     "prepublish": "npm run build",
-    "qa": "npm run lint && npm run test",
+    "qa": "npm run tsfmt && npm run lint && npm run test",
     "tsfmt": "tsfmt --replace --verbose",
     "test": "ts-node -P . -C typescript node_modules/.bin/tape src/**/*.test.ts | node_modules/.bin/tap-diff"
   },
