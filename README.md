@@ -44,7 +44,8 @@ The following NPM scripts have been defined for this package:
 | :----------------- | :-------------------------------------------------------
 | `npm test`         | Runs all unit tests.
 | `npm run lint`     | Runs the typescript linter for all source files.
-| `npm run qa`       | Runs the typescript linter first and the unit tests afterwards.
+| `npm run fmt`      | Runs the typescript code formatter for all source files.
+| `npm run qa`       | Runs the typescript formatter and linter first and the unit tests afterwards.
 | `npm run build`    | Transpiles the typescript source files into javascript files.
 
 ### Conventions

@@ -9,12 +9,12 @@
     "npm": ">=3.10.0"
   },
   "scripts": {
-    "build": "rimraf ./lib && npm run qa && tsc --project ./tsconfig.json",
-    "lint": "tslint -c ./tslint.json ./src/**/*.ts*",
     "prepublish": "npm run build",
-    "qa": "npm run tsfmt && npm run lint && npm run test",
-    "tsfmt": "tsfmt --replace --verbose",
-    "test": "ts-node -P . -C typescript node_modules/.bin/tape src/**/*.test.ts | node_modules/.bin/tap-diff"
+    "build": "rimraf ./lib && npm run qa && tsc --project ./tsconfig.json",
+    "fmt": "tsfmt --replace --verbose",
+    "lint": "tslint -c ./tslint.json ./src/**/*.ts*",
+    "test": "ts-node -P . -C typescript node_modules/.bin/tape src/**/*.test.ts | node_modules/.bin/tap-diff",
+    "qa": "npm run fmt && npm run lint && npm run test"
   },
   "repository": {
     "type": "git",
