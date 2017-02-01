@@ -32,7 +32,7 @@ export default class HttpError extends Error {
    * @param [message] Optional error message. If no message is given, the
    * default message of the given HTTP code is used.
    */
-  constructor(code: number, message?: string) {
+  public constructor(code: number, message?: string) {
     super(message || STATUS_CODES[code]);
 
     this.code = code;

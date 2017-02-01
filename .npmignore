@@ -1,10 +1,5 @@
-.editorconfig
-.gitignore
-.npmignore
-tsconfig.json
-tslint.json
-dev
-docs
-node_modules
-src
-tmp
+*
+!/lib/*
+!/LICENSE
+!/README.md
+!/package.json

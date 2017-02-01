@@ -49,23 +49,23 @@ export default class HttpServer implements IHttpHandler {
   /**
    * The number of concurrent requests.
    */
-  private requests: number = 0;
+  protected requests: number = 0;
 
   /**
    * Internal storage for registered HTTP handlers.
    */
-  private httpHandlers: [string, number, IHttpHandler][] = [];
+  protected httpHandlers: [string, number, IHttpHandler][] = [];
 
   /**
    * The number of concurrent requests.
    */
-  private encodingRe: RegExp = /(deflate|gzip)/;
+  protected encodingRe: RegExp = /(deflate|gzip)/;
 
   /**
    * The `HttpServer` can be bound to node's HTTP/HTTPS server's `request`
    * event for handling incoming requests.
    */
-  constructor() {
+  public constructor() {
     this.handleRequest = this.handleRequest.bind(this);
     this.handleRequestDone = this.handleRequestDone.bind(this);
   }
@@ -134,7 +134,7 @@ export default class HttpServer implements IHttpHandler {
    * @param response Node's HTTP server response object.
    * @param result The data to send to the client.
    */
-  private sendResult(request: http.IncomingMessage, response: http.ServerResponse, result: IHttpResult): void {
+  protected sendResult(request: http.IncomingMessage, response: http.ServerResponse, result: IHttpResult): void {
     if (result.data && !(result.headers && result.headers["Content-Encoding"]) && request.headers["accept-encoding"]) {
       const match = request.headers["accept-encoding"].match(this.encodingRe);
 
@@ -162,7 +162,7 @@ export default class HttpServer implements IHttpHandler {
    * @param response Node's HTTP server response object.
    * @param error The error to send to the client.
    */
-  private sendError(request: http.IncomingMessage, response: http.ServerResponse, error: Error): void {
+  protected sendError(request: http.IncomingMessage, response: http.ServerResponse, error: Error): void {
     const httpError: HttpError = HttpError.fromError(error);
     const rs: Readable = new Readable({
       read: () => void 0
@@ -180,7 +180,17 @@ export default class HttpServer implements IHttpHandler {
     rs.push(null);
   }
 
-  private encodeResult(format: string, result: IHttpResult): IHttpResult {
+  /**
+   * Encodes the result's data stream.
+   * @param format Name of the encoding format. Supports `gzip` and `deflate`.
+   * @param result The result to encode.
+   * @returns {IHttpResult}
+   */
+  protected encodeResult(format: string, result: IHttpResult): IHttpResult {
+    if (!result.data) {
+      return result;
+    }
+
     let compressor: zlib.Gzip | zlib.Deflate;
 
     switch (format) {
@@ -212,7 +222,7 @@ export default class HttpServer implements IHttpHandler {
    * @param request Node's HTTP incoming request object.
    * @param response Node's HTTP server response object.
    */
-  private handleRequest(request: http.IncomingMessage, response: http.ServerResponse): void {
+  protected handleRequest(request: http.IncomingMessage, response: http.ServerResponse): void {
     const timestamp: number = Date.now();
     const method: string = request.method;
 
@@ -250,7 +260,7 @@ export default class HttpServer implements IHttpHandler {
   /**
    * Handler for events that indicate that a request is done processing.
    */
-  private handleRequestDone() {
+  protected handleRequestDone() {
     // decrease number of requests currently handled by this server
     this.requests = (this.requests - 1);
   }

@@ -6,7 +6,7 @@ import { Url } from "url";
  */
 export interface IHttpRequest {
   /**
-   * The HTTP method ofthe incoming request.
+   * The HTTP method of the incoming request.
    */
   method: string;
 
@@ -17,7 +17,7 @@ export interface IHttpRequest {
   mime?: string;
 
   /**
-   * The wrapped native incoming HTTP request.
+   * Node's native incoming HTTP request.
    */
   raw: IncomingMessage;
 

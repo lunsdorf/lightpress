@@ -69,7 +69,7 @@ export default class AssetHandler implements IHttpHandler {
    * @param pathname The requested pathname.
    * @return The path to the requested file.
    */
-  private filepath(pathname: string): string {
+  protected filepath(pathname: string): string {
     if (0 !== pathname.indexOf(this.baseUrl)) {
       throw new Error("pathname does not match base URL");
     }
