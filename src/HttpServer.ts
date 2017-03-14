@@ -109,9 +109,9 @@ export default class HttpServer implements IHttpHandler {
    * @return A promise that will be resolved by the delegated HTTP handler.
    */
   public serveHttpAsync(request: IHttpRequest): Promise<IHttpResult> {
-    const pathname = request.url.pathname;
+    const pathname = request.url.pathname || "/";
     let matchedLength = 0;
-    let matchedHandler: IHttpHandler;
+    let matchedHandler: IHttpHandler | undefined;
 
     for (let i = 0, l = this.httpHandlers.length; i < l; i++) {
       const [path, pathLength, handler] = this.httpHandlers[i];
@@ -122,7 +122,7 @@ export default class HttpServer implements IHttpHandler {
       }
     }
 
-    if (matchedHandler) {
+    if ("undefined" !== typeof matchedHandler) {
       return matchedHandler.serveHttpAsync(request);
     } else {
       return Promise.reject<IHttpResult>(new HttpError(404));
@@ -219,7 +219,7 @@ export default class HttpServer implements IHttpHandler {
    */
   protected handleRequest(request: http.IncomingMessage, response: http.ServerResponse): void {
     const timestamp: number = Date.now();
-    const method: string = request.method;
+    const method: string = request.method || "GET";
 
     this.requests = (this.requests + 1);
 
@@ -236,8 +236,8 @@ export default class HttpServer implements IHttpHandler {
       return void this.sendError(request, response, new HttpError(503));
     }
 
-    const url: Url = parse(request.url, true);
-    const ext: string = path.extname(url.pathname);
+    const url: Url = parse(request.url || "/", true);
+    const ext: string = path.extname(url.pathname || "/");
     const r: IHttpRequest = {
       method: method,
       mime: ext ? MIME_TYPES[ext] || MIME_TYPES[".bin"] : null, // unknown defaults to application/octet-stream

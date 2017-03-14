@@ -19,14 +19,14 @@ Typescript example to create and bind a server that serves static fiels from the
 
 ```ts
 import {createServer, Server} from "http";
-import {HttpServer, AssetHandler} from "lightpress";
+import {HttpServer, FileHandler} from "lightpress";
 
 const http: Server = createServer();
 const app: HttpServer = new HttpServer();
 
 // configure app server
 app.bindHttpListener(http);
-app.handleHttp("/assets/", new AssetHandler("./assets/"));
+app.handleHttp("/assets/", new FileHandler("./assets/"));
 
 // listen for HTTP requests
 http.listen(8080);

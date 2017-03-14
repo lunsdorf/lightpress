@@ -14,7 +14,7 @@ export interface IHttpRequest {
    * The mime type of the incoming request. Should be undefined if the
    * requested URL points to a directory.
    */
-  mime?: string;
+  mime: string | null;
 
   /**
    * Node's native incoming HTTP request.
@@ -30,7 +30,7 @@ export interface IHttpRequest {
    * A token that identifies the requesting client. This is Usually extracted
    * from the request headers.
    */
-  token?: string;
+  token: string | null;
 
   /**
    * The already parsed URL of the incoming HTTP request.

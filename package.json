@@ -1,6 +1,6 @@
 {
   "name": "lightpress",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "A tiny HTTP server.",
   "main": "lib/main.js",
   "typings": "lib/main.d.ts",
@@ -10,7 +10,7 @@
   },
   "scripts": {
     "prepublish": "npm run build",
-    "build": "rimraf ./lib && npm run qa && tsc --project ./tsconfig.json",
+    "build": "rimraf ./lib && npm run qa && tsc --project ./tsconfig.json && copyup ./src/**/*.d.ts ./lib",
     "fmt": "tsfmt --replace --verbose",
     "lint": "tslint -c ./tslint.json ./src/**/*.ts*",
     "test": "ts-node -P . -C typescript node_modules/.bin/tape src/**/*.test.ts | node_modules/.bin/tap-diff",
@@ -33,6 +33,7 @@
   "devDependencies": {
     "@types/node": "^6.0.62",
     "@types/tape": "^4.2.27",
+    "copyfiles": "^1.2.0",
     "rimraf": "^2.5.4",
     "tap-diff": "^0.1.1",
     "tape": "^4.6.0",

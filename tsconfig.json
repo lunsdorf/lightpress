@@ -1,18 +1,26 @@
 {
   "compilerOptions": {
+    "alwaysStrict": true,
+    "baseUrl": "./src",
     "declaration": true,
+    "forceConsistentCasingInFileNames": true,
     "isolatedModules": false,
-    "jsx": "react",
     "module": "commonjs",
     "moduleResolution": "node",
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitAny": true,
+    "noImplicitReturns": true,
     "noImplicitThis": true,
+    "noImplicitUseStrict": false,
     "noUnusedLocals": true,
-    "noUnusedParameters": true,
+    "noUnusedParameters": false,
     "outDir": "lib/",
     "preserveConstEnums": true,
+    "pretty": true,
     "removeComments": true,
     "sourceMap": false,
-    "target": "es6"
+    "strictNullChecks": true,
+    "target": "es2015"
   },
   "exclude": [
     "node_modules/",

@@ -6,7 +6,7 @@ import { IHttpRequest } from "./IHttpRequest";
 import HttpError from "./HttpError";
 import MIME_TYPES from "./MIME_TYPES";
 
-export default class AssetHandler implements IHttpHandler {
+export default class FileHandler implements IHttpHandler {
   /**
    * The path in the filesystem where the static files that will be served are
    * stored.
@@ -38,7 +38,7 @@ export default class AssetHandler implements IHttpHandler {
     let filepath: string;
 
     try {
-      filepath = this.filepath(request.url.pathname);
+      filepath = this.filepath(request.url.pathname || "/");
     } catch (e) {
       return Promise.reject<IHttpResult>(new HttpError(404));
     }
