@@ -17,6 +17,11 @@ export interface IHttpRequest {
   mime: string | null;
 
   /**
+   * The request's pathname.
+   */
+  pathname: string;
+
+  /**
    * Node's native incoming HTTP request.
    */
   raw: IncomingMessage;

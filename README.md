@@ -15,21 +15,22 @@ $ npm install lightpress
 
 ### Example
 
-Typescript example to create and bind a server that serves static fiels from the projects `./assets/` directory.
+Typescript example to create and bind a server that serves static fiels from the projects `./public/` directory.
 
 ```ts
 import {createServer, Server} from "http";
+import {join} from "path";
 import {HttpServer, FileHandler} from "lightpress";
 
-const http: Server = createServer();
+const server: Server = createServer();
 const app: HttpServer = new HttpServer();
 
 // configure app server
-app.bindHttpListener(http);
-app.handleHttp("/assets/", new FileHandler("./assets/"));
+app.bindHttpListener(server);
+app.handleHttp("/assets/", true, new FileHandler(join(process.cwd(), "public")));
 
 // listen for HTTP requests
-http.listen(8080);
+server.listen(8080, () => console.log(`Listening to port :${server.address().port} …`));
 ```
 
 

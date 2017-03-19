@@ -13,12 +13,17 @@ export interface IHttpResult {
   code: number;
 
   /**
-   * Additional HTTP headers to include in the response.
-   */
-  headers?: HttpHeaders;
-
-  /**
-   * Additional payload data to send to the requesting client.
+   * Optional payload data to send to the requesting client.
    */
   data?: Readable | Transform;
+
+  /**
+   * Flag to tell the server that the payload data has already been encoded.
+   */
+  encoded?: boolean;
+
+  /**
+   * Optional HTTP headers to send in the response.
+   */
+  headers?: HttpHeaders;
 }

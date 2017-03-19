@@ -14,12 +14,6 @@ export default class FileHandler implements IHttpHandler {
   public basePath: string;
 
   /**
-   * The prefix part of the URL, that is cut off from the URL's pathname when
-   * building the concrete file path.
-   */
-  public baseUrl: string = "/assets/";
-
-  /**
    * An HTTP handler for serving static files.
    * @param basePath The filesystem path from where to serve the static files.
    */
@@ -35,15 +29,9 @@ export default class FileHandler implements IHttpHandler {
    * @return A promise that will be resolved with the requested file.
    */
   public serveHttpAsync(request: IHttpRequest): Promise<IHttpResult> {
-    let filepath: string;
-
-    try {
-      filepath = this.filepath(request.url.pathname || "/");
-    } catch (e) {
-      return Promise.reject<IHttpResult>(new HttpError(404));
-    }
-
     return new Promise<IHttpResult>((resolve, reject) => {
+      const filepath: string = path.resolve(this.basePath, "." + request.pathname);
+
       fs.stat(filepath, (error: Error, stats: fs.Stats) => {
         if (error || !stats.isFile()) {
           reject(new HttpError(404));
@@ -61,19 +49,5 @@ export default class FileHandler implements IHttpHandler {
         }
       });
     });
-  }
-
-  /**
-   * Builds the file path from the base path, the base URL and the given
-   * pathname.
-   * @param pathname The requested pathname.
-   * @return The path to the requested file.
-   */
-  protected filepath(pathname: string): string {
-    if (0 !== pathname.indexOf(this.baseUrl)) {
-      throw new Error("pathname does not match base URL");
-    }
-
-    return path.resolve(this.basePath, "./" + pathname.substr(this.baseUrl.length));
   }
 }

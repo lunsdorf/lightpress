@@ -17,7 +17,7 @@ export default class HttpServer implements IHttpHandler {
    * The number of maximum concurrent requests. Any more requests will be
    * responded with a `503 Service Unavailable` error.
    */
-  public maxRequests: number = 10000;
+  public maxRequests: number = 1000;
 
   /**
    * Name of the HTTP header that stores the user's identity token.
@@ -55,7 +55,7 @@ export default class HttpServer implements IHttpHandler {
   /**
    * Internal storage for registered HTTP handlers.
    */
-  protected httpHandlers: [string, number, IHttpHandler][] = [];
+  protected httpHandlers: [string, number, boolean, IHttpHandler][] = [];
 
   /**
    * The number of concurrent requests.
@@ -94,11 +94,13 @@ export default class HttpServer implements IHttpHandler {
    * comparing the beginning of the requested URL. If multiple paths match, the
    * longer one is used.
    * @param path The URL's base path to register the handler for.
+   * @param strip Will strip the given path from the request's pathname before
+   * the given handler is invoked.
    * @param handler The HTTP handler to invoke when matching the method and
    * path.
    */
-  public handleHttp(path: string, handler: IHttpHandler): void {
-    this.httpHandlers.push([path, path.length, handler]);
+  public handleHttp(path: string, strip: boolean, handler: IHttpHandler): void {
+    this.httpHandlers.push([path, path.length, true === strip, handler]);
   }
 
   /**
@@ -109,20 +111,31 @@ export default class HttpServer implements IHttpHandler {
    * @return A promise that will be resolved by the delegated HTTP handler.
    */
   public serveHttpAsync(request: IHttpRequest): Promise<IHttpResult> {
-    const pathname = request.url.pathname || "/";
-    let matchedLength = 0;
+    const pathname: string = request.pathname;
+    let matchedLength: number = 0;
+    let matchedStrip: boolean = false;
     let matchedHandler: IHttpHandler | undefined;
 
     for (let i = 0, l = this.httpHandlers.length; i < l; i++) {
-      const [path, pathLength, handler] = this.httpHandlers[i];
+      const [path, pathLength, strip, handler] = this.httpHandlers[i];
 
       if (matchedLength < pathLength && 0 === pathname.indexOf(path)) {
         matchedLength = pathLength;
+        matchedStrip = strip;
         matchedHandler = handler;
       }
     }
 
     if ("undefined" !== typeof matchedHandler) {
+      if (matchedStrip && 1 < matchedLength) {
+        request.pathname = pathname.substr(matchedLength);
+
+        // ensure the request's pathname always starts with a slash
+        if ("/" !== request.pathname.charAt(0)) {
+          request.pathname = "/" + request.pathname;
+        }
+      }
+
       return matchedHandler.serveHttpAsync(request);
     } else {
       return Promise.reject<IHttpResult>(new HttpError(404));
@@ -136,7 +149,7 @@ export default class HttpServer implements IHttpHandler {
    * @param result The data to send to the client.
    */
   protected sendResult(request: http.IncomingMessage, response: http.ServerResponse, result: IHttpResult): void {
-    if (result.data && !(result.headers && result.headers["Content-Encoding"]) && request.headers["accept-encoding"]) {
+    if (result.data && !result.encoded && request.headers["accept-encoding"]) {
       const match = request.headers["accept-encoding"].match(this.encodingRe);
 
       if (match) {
@@ -237,10 +250,12 @@ export default class HttpServer implements IHttpHandler {
     }
 
     const url: Url = parse(request.url || "/", true);
-    const ext: string = path.extname(url.pathname || "/");
+    const pathname: string = url.pathname || "/";
+    const ext: string = path.extname(pathname);
     const r: IHttpRequest = {
       method: method,
       mime: ext ? MIME_TYPES[ext] || MIME_TYPES[".bin"] : null, // unknown defaults to application/octet-stream
+      pathname: pathname,
       raw: request,
       timestamp: timestamp,
       token: request.headers[this.tokenHeader.toLowerCase()] || null,
