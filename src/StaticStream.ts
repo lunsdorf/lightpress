@@ -29,7 +29,7 @@ export default class StaticStream extends Readable {
    * for details.
    * @param size Number of bytes to read asynchronously
    */
-  protected _read(size: number): void {
+  public _read(size: number): void {
     if (0 === this.data.length) {
       this.push(null);
     } else {
