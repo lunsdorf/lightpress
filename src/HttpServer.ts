@@ -1,6 +1,6 @@
 import * as http from "http";
 import * as https from "https";
-import * as path from "path";
+import { extname } from "path";
 import * as zlib from "zlib";
 import { Transform } from "stream";
 import { parse, Url } from "url";
@@ -251,7 +251,7 @@ export default class HttpServer implements IHttpHandler {
 
     const url: Url = parse(request.url || "/", true);
     const pathname: string = url.pathname || "/";
-    const ext: string = path.extname(pathname);
+    const ext: string = extname(pathname);
     const r: IHttpRequest = {
       method: method,
       mime: ext ? MIME_TYPES[ext] || MIME_TYPES[".bin"] : null, // unknown defaults to application/octet-stream

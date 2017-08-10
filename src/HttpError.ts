@@ -1,5 +1,11 @@
 import { STATUS_CODES } from "http";
 
+export interface HttpErrorJson {
+  code: number;
+  error: true;
+  message: string;
+}
+
 export default class HttpError extends Error {
   /**
    * Error type name.
@@ -42,7 +48,7 @@ export default class HttpError extends Error {
    * Converts this error to a JSON object.
    * @return The converted JSON object.
    */
-  public toJSON(): any {
+  public toJSON(): HttpErrorJson {
     return {
       code: this.code,
       error: true,
