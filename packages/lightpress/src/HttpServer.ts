@@ -35,7 +35,7 @@ export default class HttpServer implements IHttpHandler {
     "PATCH": true,
     "POST": true,
     "PUT": true,
-    "TRACE": true
+    "TRACE": true,
   };
 
   /**
@@ -44,7 +44,7 @@ export default class HttpServer implements IHttpHandler {
   public payloadMethods: { [method: string]: boolean } = {
     "PATCH": true,
     "POST": true,
-    "PUT": true
+    "PUT": true,
   };
 
   /**
@@ -149,8 +149,11 @@ export default class HttpServer implements IHttpHandler {
    * @param result The data to send to the client.
    */
   protected sendResult(request: http.IncomingMessage, response: http.ServerResponse, result: IHttpResult): void {
-    if (result.data && !result.encoded && request.headers["accept-encoding"]) {
-      const match = request.headers["accept-encoding"].match(this.encodingRe);
+    if (result.data && !result.encoded) {
+      const acceptEncoding = request.headers["accept-encoding"];
+      const match = "string" === typeof acceptEncoding
+        ? acceptEncoding.match(this.encodingRe)
+        : null;
 
       if (match) {
         result = this.encodeResult(match[1], result);
@@ -183,8 +186,8 @@ export default class HttpServer implements IHttpHandler {
       code: httpError.code,
       data: new StaticStream(JSON.stringify(httpError)),
       headers: {
-        "Content-Type": MIME_TYPES[".json"]
-      }
+        "Content-Type": MIME_TYPES[".json"],
+      },
     });
   }
 
@@ -252,14 +255,15 @@ export default class HttpServer implements IHttpHandler {
     const url: Url = parse(request.url || "/", true);
     const pathname: string = url.pathname || "/";
     const ext: string = extname(pathname);
+    const token: void | string | string[] = request.headers[this.tokenHeader.toLowerCase()];
     const r: IHttpRequest = {
       method: method,
       mime: ext ? MIME_TYPES[ext] || MIME_TYPES[".bin"] : null, // unknown defaults to application/octet-stream
       pathname: pathname,
       raw: request,
       timestamp: timestamp,
-      token: request.headers[this.tokenHeader.toLowerCase()] || null,
-      url: url
+      token: "string" === typeof token ? token : null,
+      url: url,
     };
 
     return void this.serveHttpAsync(r)

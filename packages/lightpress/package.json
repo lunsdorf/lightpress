@@ -1,0 +1,45 @@
+{
+  "name": "lightpress",
+  "version": "0.2.1",
+  "description": "A tiny HTTP server.",
+  "main": "lib/main.js",
+  "typings": "lib/main.d.ts",
+  "engines": {
+    "node": ">=6.5.0",
+    "npm": ">=3.10.0"
+  },
+  "scripts": {
+    "prepublish": "npm run build",
+    "build": "rimraf ./lib && npm run qa && tsc --project ./tsconfig.json && copyup ./src/**/*.d.ts ./lib",
+    "fmt": "tsfmt --replace",
+    "lint": "tslint -c ./tslint.json ./src/**/*.ts*",
+    "test": "tape -r ts-node/register src/**/*.test.js | tap-diff",
+    "qa": "npm run fmt && npm run lint && npm run test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lunsdorf/lightpress.git"
+  },
+  "keywords": [
+    "http",
+    "server"
+  ],
+  "author": "Sören Lünsdorf <code@lunsdorf.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/lunsdorf/lightpress/issues"
+  },
+  "homepage": "https://github.com/lunsdorf/lightpress#readme",
+  "devDependencies": {
+    "@types/node": "^9.6.5",
+    "@types/tape": "^4.2.32",
+    "copyfiles": "^2.0.0",
+    "rimraf": "^2.6.2",
+    "tap-diff": "^0.1.1",
+    "tape": "^4.9.0",
+    "ts-node": "^5.0.1",
+    "tslint": "^5.9.1",
+    "typescript": "^2.8.1",
+    "typescript-formatter": "^7.2.0"
+  }
+}

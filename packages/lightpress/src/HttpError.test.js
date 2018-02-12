@@ -1,7 +1,7 @@
-import * as test from "tape";
-import { STATUS_CODES } from "http";
+const test = require("tape");
+const { STATUS_CODES } = require("http");
 
-import HttpError from "./HttpError";
+const { default: HttpError } = require("./HttpError");
 
 test("The `HttpError` constructor", t => {
   t.equal(typeof HttpError.fromError, "function", "should have a `fromError` method to convert errors");
@@ -11,10 +11,10 @@ test("The `HttpError` constructor", t => {
 test("The `HttpError` instance", t => {
   const code = 400;
   const message = "Custom Error";
-  const e1: HttpError = new HttpError(code);
-  const e2: HttpError = new HttpError(code, message);
-  const e3: HttpError = HttpError.fromError(new Error(message));
-  const e4: HttpError = HttpError.fromError(new Error(message), 400);
+  const e1 = new HttpError(code);
+  const e2 = new HttpError(code, message);
+  const e3 = HttpError.fromError(new Error(message));
+  const e4 = HttpError.fromError(new Error(message), 400);
 
   t.ok(e1 instanceof Error, "should be an instance of `Error`");
   t.equal(e1.code, code, "should have the error code passed to the constructor");

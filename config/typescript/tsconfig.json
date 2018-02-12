@@ -1,10 +1,14 @@
 {
   "compilerOptions": {
     "alwaysStrict": true,
-    "baseUrl": "./src",
+    "baseUrl": "../../packages/",
     "declaration": true,
     "forceConsistentCasingInFileNames": true,
     "isolatedModules": false,
+    "importHelpers": false,
+    "lib": [
+      "es2015"
+    ],
     "module": "commonjs",
     "moduleResolution": "node",
     "noFallthroughCasesInSwitch": true,
@@ -14,22 +18,21 @@
     "noImplicitUseStrict": false,
     "noUnusedLocals": true,
     "noUnusedParameters": false,
-    "outDir": "lib/",
+    "paths": {
+      "@lightpress/*": ["./*"]
+    },
     "preserveConstEnums": true,
     "pretty": true,
     "removeComments": true,
-    "sourceMap": false,
+    "sourceMap": true,
+    "strict": true,
     "strictNullChecks": true,
     "target": "es2015"
   },
   "exclude": [
-    "node_modules/",
-    "lib/",
-    "src/**/*.test.ts",
-    "src/**/*.test.tsx"
+    "node_modules/"
   ],
   "include": [
-    "src/**/*.ts",
-    "src/**/*.tsx"
+    "typings/**/*.d.ts"
   ]
 }

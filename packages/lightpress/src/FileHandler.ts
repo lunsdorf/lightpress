@@ -43,8 +43,8 @@ export default class FileHandler implements IHttpHandler {
             data: fs.createReadStream(filepath),
             headers: {
               "Content-Length": stats.size.toString(10),
-              "Content-Type": MIME_TYPES[extname] || MIME_TYPES[".bin"]
-            }
+              "Content-Type": MIME_TYPES[extname] || MIME_TYPES[".bin"],
+            },
           });
         }
       });

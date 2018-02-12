@@ -985,7 +985,7 @@ const MIME_TYPES: { [extname: string]: string } = {
   ".zip": "application/zip",
   ".zir": "application/vnd.zul",
   ".zirz": "application/vnd.zul",
-  ".zmm": "application/vnd.handheld-entertainment+xml"
+  ".zmm": "application/vnd.handheld-entertainment+xml",
 };
 
 export default MIME_TYPES;

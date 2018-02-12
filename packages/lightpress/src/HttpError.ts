@@ -8,16 +8,6 @@ export interface HttpErrorJson {
 
 export default class HttpError extends Error {
   /**
-   * Error type name.
-   */
-  public name: string = "HttpError";
-
-  /**
-   * The error's HTTP code.
-   */
-  public code: number;
-
-  /**
    * Converts the given error to an HTTP error instance.
    * @param error The error to convert. If this is already an HTTP error
    * instance, the same reference will be returned without converting it.
@@ -30,6 +20,16 @@ export default class HttpError extends Error {
       return new HttpError(code, error.message);
     }
   }
+
+  /**
+   * Error type name.
+   */
+  public name: string = "HttpError";
+
+  /**
+   * The error's HTTP code.
+   */
+  public code: number;
 
   /**
    * The HTTP error represents an error based on the HTTP error codes. It can be
@@ -52,7 +52,7 @@ export default class HttpError extends Error {
     return {
       code: this.code,
       error: true,
-      message: this.message
+      message: this.message,
     };
   }
 }
