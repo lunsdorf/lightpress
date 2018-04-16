@@ -1,7 +1,6 @@
 import { Readable, ReadableOptions } from "stream";
 
 export default class StaticStream extends Readable {
-
   /**
    * The data that will be streamed.
    */
