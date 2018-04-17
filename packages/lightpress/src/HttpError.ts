@@ -7,10 +7,6 @@ export interface HttpErrorJson {
 }
 
 export default class HttpError extends Error {
-  public static isHttpError(error: Error): error is HttpError {
-    return "HttpError" === error.name && error.hasOwnProperty("code");
-  }
-
   /**
    * Converts the given error to an HTTP error instance.
    * @param error The error to convert. If this is already an HTTP error
@@ -18,7 +14,7 @@ export default class HttpError extends Error {
    * @param code The HTTP code for the newly created HTTP error.
    */
   public static fromError(error: Error, code = 500): HttpError {
-    if (HttpError.isHttpError(error)) {
+    if (error instanceof HttpError) {
       return error;
     } else {
       return new HttpError(code, error.message);
@@ -44,6 +40,10 @@ export default class HttpError extends Error {
    */
   public constructor(code: number, message?: string) {
     super(message || STATUS_CODES[code]);
+
+    // tslint:disable-next-line: max-line-length
+    // https://github.com/Microsoft/TypeScript-wiki/blob/master/Breaking-Changes.md#extending-built-ins-like-error-array-and-map-may-no-longer-work
+    Object.setPrototypeOf(this, HttpError.prototype);
 
     this.code = code;
   }

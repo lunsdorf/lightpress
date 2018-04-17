@@ -1,16 +1,20 @@
 import { OutgoingHttpHeaders, ServerRequest, ServerResponse } from "http";
-import { Readable, Transform } from "stream";
+import { Readable } from "stream";
 
 export type HttpResult = {
   /** The HTTP status code to send to the requesting client. */
   code: number;
 
   /** Optional payload data to send to the requesting client. */
-  data?: Readable | Transform;
+  data?: null | string | Buffer | Readable;
 
   /**  Optional HTTP headers to send in the response. */
   headers?: OutgoingHttpHeaders;
 };
+
+function isStream(data?: null | string | Buffer | Readable): data is Readable {
+  return data instanceof Readable;
+}
 
 export default function sendResult(req: ServerRequest, res: ServerResponse, result: HttpResult): void {
   if (result.headers) {
@@ -19,9 +23,9 @@ export default function sendResult(req: ServerRequest, res: ServerResponse, resu
     res.statusCode = result.code;
   }
 
-  if (result.data) {
+  if (isStream(result.data)) {
     result.data.pipe(res);
   } else {
-    res.end();
+    res.end(result.data);
   }
 }

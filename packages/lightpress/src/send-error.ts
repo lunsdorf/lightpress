@@ -1,16 +1,15 @@
 import { ServerRequest, ServerResponse } from "http";
 import HttpError from "./HttpError";
-import StaticStream from "./StaticStream";
 import sendResult from "./send-result";
 
 export default function sendError(req: ServerRequest, res: ServerResponse, error: Error): void {
-  const httpError: HttpError = HttpError.fromError(error);
+  const httpError = HttpError.fromError(error);
 
   sendResult(req, res, {
     code: httpError.code,
-    data: new StaticStream(JSON.stringify(httpError)),
+    data: `${httpError.code} ${httpError.message}`,
     headers: {
-      "Content-Type": "application/json",
+      "Content-Type": "text/plain; charset=utf-8",
     },
   });
 }

@@ -1,9 +1,9 @@
 {
-  "name": "@lightpress/lightpress",
+  "name": "@lightpress/serve-json-error",
   "version": "0.3.0",
-  "description": "Your composable HTTP server.",
-  "main": "lib/main.js",
-  "typings": "lib/main.d.ts",
+  "description": "A lightpress handler that sends errors as JSON.",
+  "main": "lib/serve-json-error.js",
+  "typings": "lib/serve-json-error.d.ts",
   "engines": {
     "node": ">=8.10.0",
     "yarn": "^1.5.0"
@@ -31,6 +31,9 @@
     "url": "https://github.com/lunsdorf/lightpress/issues"
   },
   "homepage": "https://github.com/lunsdorf/lightpress#readme",
+  "peerDependencies": {
+    "@lightpress/lightpress": "^0.3.0"
+  },
   "devDependencies": {
     "@types/node": "^9.6.5",
     "@types/tape": "^4.2.32",

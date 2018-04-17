@@ -1,9 +1,9 @@
 {
-  "name": "@lightpress/lightpress",
+  "name": "@lightpress/serve-file",
   "version": "0.3.0",
-  "description": "Your composable HTTP server.",
-  "main": "lib/main.js",
-  "typings": "lib/main.d.ts",
+  "description": "A lightpress handler for serving static files.",
+  "main": "lib/serve-file.js",
+  "typings": "lib/serve-file.d.ts",
   "engines": {
     "node": ">=8.10.0",
     "yarn": "^1.5.0"
@@ -21,6 +21,7 @@
   "keywords": [
     "composable",
     "express",
+    "file",
     "http",
     "lightpress",
     "server"
@@ -31,6 +32,9 @@
     "url": "https://github.com/lunsdorf/lightpress/issues"
   },
   "homepage": "https://github.com/lunsdorf/lightpress#readme",
+  "peerDependencies": {
+    "@lightpress/lightpress": "^0.3.0"
+  },
   "devDependencies": {
     "@types/node": "^9.6.5",
     "@types/tape": "^4.2.32",
