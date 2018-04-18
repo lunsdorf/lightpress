@@ -3,3 +3,4 @@ export { default as convertRequest, HttpRequest } from "./convert-request";
 export { default as sendError } from "./send-error";
 export { default as sendResult, HttpResult } from "./send-result";
 export { default as HttpError, HttpErrorJson } from "./HttpError";
+export { default as StaticStream } from "./StaticStream";

@@ -1,7 +1,7 @@
 import { OutgoingHttpHeaders } from "http";
 import { createDeflate, createGzip, Deflate, Gzip } from "zlib";
 import { Readable } from "stream";
-import { HttpFunction, HttpResult, HttpRequest } from "@lightpress/lightpress";
+import { HttpFunction, HttpResult, HttpRequest, StaticStream } from "@lightpress/lightpress";
 
 const encodingRe = /(deflate|gzip)/;
 
@@ -30,20 +30,7 @@ function ensureDataStream(data: string | Buffer | Readable): Readable {
     return data;
   }
 
-  let buffer = "string" === typeof data
-    ? Buffer.from(data)
-    : data;
-
-  return new Readable({
-    read: function(size?: number): void {
-      if (0 === buffer.length) {
-        this.push(null);
-      } else {
-        this.push(buffer.slice(0, size));
-        buffer = buffer.slice(size);
-      }
-    },
-  });
+  return new StaticStream(data);
 }
 
 /**
