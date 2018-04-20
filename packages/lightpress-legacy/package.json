@@ -1,0 +1,41 @@
+{
+  "name": "lightpress",
+  "version": "0.3.0",
+  "description": "Your composable HTTP server.",
+  "main": "lib/lightpress-legacy.js",
+  "typings": "lib/lightpress-legacy.d.ts",
+  "engines": {
+    "node": ">=8.10.0",
+    "yarn": "^1.5.0"
+  },
+  "scripts": {
+    "prepublish": "npm run lint && npm run test && npm run build",
+    "build": "rimraf ./lib && tsc -p ./tsconfig.json",
+    "lint": "tslint -c ./tslint.json -p ./tsconfig.json --fix ./src/**/*.ts*"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lunsdorf/lightpress.git"
+  },
+  "keywords": [
+    "composable",
+    "express",
+    "http",
+    "lightpress",
+    "server"
+  ],
+  "author": "Sören Lünsdorf <code@lunsdorf.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/lunsdorf/lightpress/issues"
+  },
+  "homepage": "https://github.com/lunsdorf/lightpress#readme",
+  "devDependencies": {
+    "rimraf": "^2.6.2",
+    "tslint": "^5.9.1",
+    "typescript": "^2.8.1"
+  },
+  "dependencies": {
+    "@lightpress/lightpress": "^0.3.0"
+  }
+}

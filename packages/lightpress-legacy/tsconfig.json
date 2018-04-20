@@ -1,0 +1,15 @@
+{
+  "extends": "../../config/typescript/tsconfig.json",
+  "compilerOptions": {
+    "importHelpers": false,
+    "outDir": "./lib",
+    "rootDir": "./src"
+  },
+  "exclude": [
+    "node_modules/",
+    "lib/"
+  ],
+  "include": [
+    "src/**/*"
+  ]
+}
