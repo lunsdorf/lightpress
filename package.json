@@ -1,6 +1,15 @@
 {
   "private": true,
+  "scripts": {
+    "build": "oao run-script build",
+    "clean": "oao clean",
+    "test": "oao run-script test"
+  },
   "workspaces": [
-    "package/*"
-  ]
+    "package/*",
+    "legacy/*"
+  ],
+  "devDependencies": {
+    "oao": "^1.5.1"
+  }
 }
