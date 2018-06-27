@@ -1,60 +1,54 @@
-lightpress
-===============================================================================
+# lightpress
 
-> A tiny HTTP server.
+> A thin wrapper for composing HTTP handlers.
 
 
-Getting Started
--------------------------------------------------------------------------------
+## Installation
 
-### Installation
+Use your favourite node package manager to install lightpress.
 
 ```bash
-$ npm install lightpress
+# using npm
+$ npm install --save @lightpress/lightpress
+
+# using yarn
+$ yarn add @lightpress/lightpress
 ```
+
+
+## Usage
 
 ### Example
 
-Typescript example to create a simple JSON response.
+A basic lightpress handler that returns a JSON response. 
 
-```ts
-import {createServer} from "http";
-import lightpress, {HttpRequest, HttpResult, StaticStream}  from "lightpress";
+```js
+import { createServer } from "http";
+import lightpress  from "lightpress";
 
-const server = createServer();
-const hello = (req: HttpRequest): Promise<HttpResult> => Promise.resolve({
+const hello = req => Promise.resolve({
   code: 200,
-  data: new StaticStream(JSON.stringify({ hello: "world" })),
+  data: JSON.stringify({ hello: "world" }),
   headers: {
     "Content-Type": "application/json",
   },
 });
 
-server.addListener("request", lightpress(hello));
+const server = createServer(lightpress(hello));
 server.listen(8080, () => console.log(`Listening to port :${server.address().port} …`));
 ```
 
 
-Development
--------------------------------------------------------------------------------
+## Development
 
-### NPM Scripts
+All lightpress packages are organized in a single mono-repository which is managed using `oao`. Since `oao` is based on `yarn`, you need to have `yarn` installed.
 
-The following NPM scripts have been defined for this package:
+### Global Scripts
 
-| Script             | Description
-| :----------------- | :-------------------------------------------------------
-| `npm test`         | Runs all unit tests.
-| `npm run lint`     | Runs the typescript linter for all source files.
-| `npm run fmt`      | Runs the typescript code formatter for all source files.
-| `npm run qa`       | Runs the typescript formatter and linter first and the unit tests afterwards.
-| `npm run build`    | Transpiles the typescript source files into javascript files.
+The following scripts have been defined:
 
-### Conventions
-
-Key functions/methods should be named and behave as the following:
-
-- **Asynchronous functions** return a promise and are postfixed with the `Async`, e.g `requestAsync()`.
-- **Event handlers** are prefixed with `handle` followed by the event's subject and type, e.g. `handleButtonClick()` for *click* events dispatched by a *button* resource. Event handlers within classes should be bound to the instance's `this` scope inside the constructor.
-- **Promise callbacks**, when defined separately, are prefixed with `when`, followed by the awaited subject and the postfix `Resolved` or `Rejected`, e.g. `whenRequestResolved()` or `whenRequestRejected()`. Promise callbacks within classes should be bound to the instance's `this` scope inside the constructor.
-- **Promise references** are prefixed with `await`, followed by the awaited subject, e.g. `const awaitRequest = requestAsync()`.
+| Script        | Description
+| :------------ | :-------------------------------------------------------------
+| `yarn clean`  | Delete all `node_modules` directories from sub-packages and the root package (alias for `yarn oao clean`).
+| `yarn build`  | Runs `build` for all sub-packages (alias for `yarn oao run-script build`).
+| `yarn test`   | Runs `test` for all sub-packages (alias for `yarn oao run-script test`).
