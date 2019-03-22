@@ -1,35 +1,19 @@
 {
   "compilerOptions": {
-    "alwaysStrict": true,
-    "baseUrl": "./src",
+    "allowSyntheticDefaultImports": true,
     "declaration": true,
-    "forceConsistentCasingInFileNames": true,
-    "isolatedModules": false,
+    "esModuleInterop": true,
     "module": "commonjs",
-    "moduleResolution": "node",
     "noFallthroughCasesInSwitch": true,
-    "noImplicitAny": true,
     "noImplicitReturns": true,
-    "noImplicitThis": true,
-    "noImplicitUseStrict": false,
     "noUnusedLocals": true,
-    "noUnusedParameters": false,
-    "outDir": "lib/",
-    "preserveConstEnums": true,
-    "pretty": true,
-    "removeComments": true,
-    "sourceMap": false,
-    "strictNullChecks": true,
-    "target": "es2015"
+    "noUnusedParameters": true,
+    "outDir": "./lib",
+    "strict": true,
+    "target": "esnext"
   },
   "exclude": [
     "node_modules/",
-    "lib/",
-    "src/**/*.test.ts",
-    "src/**/*.test.tsx"
-  ],
-  "include": [
-    "src/**/*.ts",
-    "src/**/*.tsx"
+    "lib/"
   ]
 }

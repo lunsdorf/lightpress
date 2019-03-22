@@ -1,20 +1,21 @@
 {
   "name": "lightpress",
-  "version": "0.2.1",
-  "description": "A tiny HTTP server.",
-  "main": "lib/main.js",
-  "typings": "lib/main.d.ts",
+  "version": "1.0.0-alpha",
+  "description": "Your composable HTTP server.",
+  "main": "lib/index.js",
+  "jsnext:main": "lib/main.mjs",
+  "typings": "lib/index.d.ts",
   "engines": {
     "node": ">=6.5.0",
     "npm": ">=3.10.0"
   },
   "scripts": {
-    "prepublish": "npm run build",
-    "build": "rimraf ./lib && npm run qa && tsc --project ./tsconfig.json && copyup ./src/**/*.d.ts ./lib",
-    "fmt": "tsfmt --replace --verbose",
+    "build": "rimraf ./lib && rollup -c",
+    "develop": "rollup -c -w",
     "lint": "tslint -c ./tslint.json ./src/**/*.ts*",
-    "test": "tape -r ts-node/register src/**/*.test.ts | tap-diff",
-    "qa": "npm run fmt && npm run lint && npm run test"
+    "prepublish": "npm run test && npm run build && npm run types",
+    "test": "jest",
+    "types": "tsc --emitDeclarationOnly"
   },
   "repository": {
     "type": "git",
@@ -24,22 +25,26 @@
     "http",
     "server"
   ],
-  "author": "Sören Lünsdorf <code@lunsdorf.com>",
   "license": "MIT",
+  "author": "Sören Lünsdorf <code@lunsdorf.com>",
+  "homepage": "https://github.com/lunsdorf/lightpress#readme",
   "bugs": {
     "url": "https://github.com/lunsdorf/lightpress/issues"
   },
-  "homepage": "https://github.com/lunsdorf/lightpress#readme",
   "devDependencies": {
-    "@types/node": "^6.0.62",
-    "@types/tape": "^4.2.30",
-    "copyfiles": "^1.2.0",
-    "rimraf": "^2.5.4",
-    "tap-diff": "^0.1.1",
-    "tape": "^4.6.0",
-    "ts-node": "^3.0.4",
-    "tslint": "^5.4.2",
-    "typescript": "^2.4.2",
-    "typescript-formatter": "^5.2.0"
+    "@babel/cli": "^7.2.3",
+    "@babel/core": "^7.4.0",
+    "@babel/plugin-proposal-class-properties": "^7.4.0",
+    "@babel/plugin-proposal-object-rest-spread": "^7.4.0",
+    "@babel/preset-env": "^7.4.2",
+    "@babel/preset-typescript": "^7.3.3",
+    "@types/jest": "^24.0.11",
+    "babel-jest": "^24.5.0",
+    "jest": "^24.5.0",
+    "rimraf": "^2.6.3",
+    "rollup": "^1.7.0",
+    "rollup-plugin-babel": "^4.3.2",
+    "rollup-plugin-import-resolver": "^1.0.4",
+    "typescript": "^3.3.4000"
   }
 }

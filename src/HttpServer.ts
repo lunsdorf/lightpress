@@ -150,7 +150,7 @@ export default class HttpServer implements IHttpHandler {
    */
   protected sendResult(request: http.IncomingMessage, response: http.ServerResponse, result: IHttpResult): void {
     if (result.data && !result.encoded && request.headers["accept-encoding"]) {
-      const match = request.headers["accept-encoding"].match(this.encodingRe);
+      const match = (request.headers["accept-encoding"] as string).match(this.encodingRe);
 
       if (match) {
         result = this.encodeResult(match[1], result);
@@ -258,7 +258,7 @@ export default class HttpServer implements IHttpHandler {
       pathname: pathname,
       raw: request,
       timestamp: timestamp,
-      token: request.headers[this.tokenHeader.toLowerCase()] || null,
+      token: (request.headers[this.tokenHeader.toLowerCase()] as string) || "",
       url: url
     };
 
