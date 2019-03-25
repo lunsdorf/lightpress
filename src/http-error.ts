@@ -6,7 +6,7 @@ export interface HttpErrorJson {
   message: string;
 }
 
-export default class HttpError extends Error {
+export class HttpError extends Error {
   /**
    * Error type name.
    */
