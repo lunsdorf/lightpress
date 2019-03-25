@@ -1,7 +1,7 @@
 const importResolver = require("rollup-plugin-import-resolver");
 const babel = require("rollup-plugin-babel");
 
-const FILE_EXTENSIONS = [".ts", ".d.ts", "js"];
+const FILE_EXTENSIONS = [".ts", "js"];
 
 module.exports = {
   input: "src/index.ts",

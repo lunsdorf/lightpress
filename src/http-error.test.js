@@ -1,5 +1,5 @@
 const { STATUS_CODES } = require("http");
-const HttpError = require("./HttpError").default;
+const { HttpError } = require("./http-error");
 
 describe("The `HttpError` constructor", () => {
   it("should have a `fromError` method to convert errors", () => {
