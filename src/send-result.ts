@@ -1,35 +1,22 @@
-import { OutgoingHttpHeaders } from "http";
+import { ServerResponse } from "http";
 import { Readable } from "stream";
-import { LightpressRequestHandle } from "./create-request-handle";
+import { LightpressInfo } from "./types/lightpress-info";
+import { LightpressResult } from "./types/lightpress-result";
 
-export type LightpressResult = {
-  /** Optional HTTP response status code. Defaults to `200`. */
-  code?: number;
+export function sendResult<T extends LightpressInfo = LightpressInfo>(response: ServerResponse, _info: T, result: LightpressResult): void {
+  const code = result && result.code ? result.code : 200;
+  const headers = result && result.headers ? result.headers : null;
+  const data = result && result.data ? result.data : null;
 
-  /** Optional response payload. */
-  data?: null | string | Buffer | Readable;
-
-  /** Optional HTTP response headers. */
-  headers?: OutgoingHttpHeaders;
-};
-
-function isReadableStream(data?: null | string | Buffer | Readable): data is Readable {
-  return data instanceof Readable;
-}
-
-export function sendResult(handle: LightpressRequestHandle, result: LightpressResult): void {
-  const { response } = handle;
-  const statusCode = result.code || 200;
-
-  if (result.headers) {
-    response.writeHead(statusCode, result.headers);
+  if (headers) {
+    response.writeHead(code, headers);
   } else {
-    response.statusCode = statusCode;
+    response.statusCode = code;
   }
 
-  if (isReadableStream(result.data)) {
-    result.data.pipe(response);
+  if (data instanceof Readable) {
+    data.pipe(response);
   } else {
-    response.end(result.data);
+    response.end(data);
   }
 }
