@@ -1,8 +1,8 @@
 module.exports = {
   comments: false,
   presets: [
-    "@babel/preset-env",
-    "@babel/typescript",
+    ["@babel/preset-env", { "targets": { "node": "10" } }],
+    ["@babel/typescript"],
   ],
   plugins: [
     "@babel/plugin-proposal-class-properties",

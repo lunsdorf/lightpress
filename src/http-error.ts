@@ -1,20 +1,10 @@
 import { STATUS_CODES } from "http";
 
-export interface HttpErrorJson {
-  code: number;
-  error: true;
-  message: string;
-}
-
 export class HttpError extends Error {
-  /**
-   * Error type name.
-   */
+  /** Error type name. */
   public name: string = "HttpError";
 
-  /**
-   * The error's HTTP code.
-   */
+  /** The error's HTTP code. */
   public code: number;
 
   /**
@@ -44,15 +34,11 @@ export class HttpError extends Error {
     this.code = code;
   }
 
-  /**
-   * Converts this error to a JSON object.
-   * @return The converted JSON object.
-   */
-  public toJSON(): HttpErrorJson {
+  /** Converts the error to a JSON object representation. */
+  public toJSON(): { code: number, error: string } {
     return {
       code: this.code,
-      error: true,
-      message: this.message
+      error: this.message,
     };
   }
 }

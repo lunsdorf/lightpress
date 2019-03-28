@@ -1,6 +1,10 @@
-export * from "./create-error-result";
-export * from "./create-request-context";
-export * from "./create-request-handle";
+// Export typings
+export * from "./types/lightpress-handler";
+export * from "./types/lightpress-info";
+export * from "./types/lightpress-result";
+
+// Export implementation
 export * from "./http-error";
 export * from "./lightpress";
+export * from "./send-error";
 export * from "./send-result";

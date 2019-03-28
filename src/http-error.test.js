@@ -53,6 +53,6 @@ describe("The `HttpError` instance", () => {
   });
 
   it("serializes to the expected JSON object", () => {
-    expect(e2.toJSON()).toEqual({ code, message, error: true });
+    expect(e2.toJSON()).toEqual({ code, error: message });
   });
 });
