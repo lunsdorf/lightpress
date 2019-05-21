@@ -4,14 +4,14 @@ import { LightpressInfo } from "./types/lightpress-info";
 import { LightpressResult } from "./types/lightpress-result";
 
 export function sendResult<T extends LightpressInfo = LightpressInfo>(response: ServerResponse, _info: T, result: LightpressResult): void {
-  const code = result && result.code ? result.code : 200;
+  const statusCode = result && result.statusCode ? result.statusCode : 200;
   const headers = result && result.headers ? result.headers : null;
-  const data = result && result.data ? result.data : null;
+  const data = result && result.body ? result.body : null;
 
   if (headers) {
-    response.writeHead(code, headers);
+    response.writeHead(statusCode, headers);
   } else {
-    response.statusCode = code;
+    response.statusCode = statusCode;
   }
 
   if (data instanceof Readable) {

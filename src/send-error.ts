@@ -4,7 +4,7 @@ import { HttpError } from "./http-error";
 import { sendResult } from "./send-result";
 
 export function sendError<T extends LightpressInfo = LightpressInfo>(response: ServerResponse, info: T, error: Error): void {
-  const { code } = HttpError.fromError(error);
-
-  sendResult(response, info, { code });
+  sendResult(response, info, {
+    statusCode: HttpError.fromError(error).code
+  });
 }
