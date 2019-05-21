@@ -2,11 +2,11 @@ import { OutgoingHttpHeaders } from "http";
 import { Readable } from "stream";
 
 export type LightpressResult = void | null | {
-  /** Optional HTTP response status code. Defaults to `200`. */
-  code?: number;
+  /** Optional response status code (defaults to `200`). */
+  statusCode?: number;
 
   /** Optional response payload. */
-  data?: null | string | Buffer | Readable;
+  body?: null | string | Buffer | Readable;
 
   /** Optional HTTP response headers. */
   headers?: OutgoingHttpHeaders;
