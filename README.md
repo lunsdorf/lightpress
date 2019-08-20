@@ -1,59 +1,107 @@
-lightpress
-===============================================================================
+# lightpress
 
-> A tiny HTTP server.
+Lightpress is a thin wrapper around node's HTTP handler interface, that let's
+you compose your application's HTTP handlers without overhead.
 
+Although you can use it for any kind of application, it was designed with
+modern API driven web applications in mind. These usually require a single
+handler for serving the (SSR) HTML content, another one for static assets, and
+one or more handlers for data.
 
-Getting Started
--------------------------------------------------------------------------------
+## Installation
 
-### Installation
+You can install `lightpress` from [npmjs.com](https://www.npmjs.com) using your
+favorite package manager, e.g.
 
 ```bash
-$ npm install lightpress
+$ npm install --save lightpress
 ```
 
-### Example
+## Getting Started
 
-Typescript example to create and bind a server that serves static fiels from the projects `./public/` directory.
+In lightpress a request handler is a plain function that takes a request info
+object as single argument and returns a result or a promise that resolves
+to a result.
 
-```ts
-import {createServer, Server} from "http";
-import {join} from "path";
-import {HttpServer, FileHandler} from "lightpress";
+By default, the request info object contains the incoming request and a
+timestamp, but can be augmented to fit the needs of your application.
 
-const server: Server = createServer();
-const app: HttpServer = new HttpServer();
+The handler's outcome, if any, has to be an object that might contain a
+`statusCode`, `headers` and a `body`.
 
-// configure app server
-app.bindHttpListener(server);
-app.handleHttp("/assets/", true, new FileHandler(join(process.cwd(), "public")));
+```js
+import { createServer } from "http";
+import { lightpress } from "lightpress";
 
-// listen for HTTP requests
-server.listen(8080, () => console.log(`Listening to port :${server.address().port} …`));
+function hello(info) {
+  return {
+    statusCode: 200,
+    headers: {
+      "Content-Type": "text/plain",
+    },
+    body: `Hello from '${info.request.url}' at ${new Date(info.timestamp).toLocaleTimeString()}.`
+  }
+}
+
+const server = createServer(lightpress(hello));
+server.listen(8080);
 ```
 
+## Composing Handlers
 
-Development
--------------------------------------------------------------------------------
+Of course, sticking everything into a single handler isn't sufficient. And the
+way lightpress solves this circumstance is by composing handlers.
 
-### NPM Scripts
+Lets imagine, the `hello` handler from above must only be called for `GET`
+requests. To achieve this we could simply check the request method inside our
+`hello` handler. However, a better approach is to move this logic into a
+separate handler which only cares about request methods.
 
-The following NPM scripts have been defined for this package:
+```js
+import { createServer } from "http";
+import { lightpress, HttpError } from "lightpress";
 
-| Script             | Description
-| :----------------- | :-------------------------------------------------------
-| `npm test`         | Runs all unit tests.
-| `npm run lint`     | Runs the typescript linter for all source files.
-| `npm run fmt`      | Runs the typescript code formatter for all source files.
-| `npm run qa`       | Runs the typescript formatter and linter first and the unit tests afterwards.
-| `npm run build`    | Transpiles the typescript source files into javascript files.
+function allowedMethods(methods, handler) {
+  return info => {
+    if (methods.include(info.request.method)) {
+      return handler(info)
+    }
 
-### Conventions
+    throw new HttpError(405);
+  }
+}
 
-Key functions/methods should be named and behave as the following:
+// define hello handler from above ...
 
-- **Asynchronous functions** return a promise and are postfixed with the `Async`, e.g `requestAsync()`.
-- **Event handlers** are prefixed with `handle` followed by the event's subject and type, e.g. `handleButtonClick()` for *click* events dispatched by a *button* resource. Event handlers within classes should be bound to the instance's `this` scope inside the constructor.
-- **Promise callbacks**, when defined separately, are prefixed with `when`, followed by the awaited subject and the postfix `Resolved` or `Rejected`, e.g. `whenRequestResolved()` or `whenRequestRejected()`. Promise callbacks within classes should be bound to the instance's `this` scope inside the constructor.
-- **Promise references** are prefixed with `await`, followed by the awaited subject, e.g. `const awaitRequest = requestAsync()`.
+const server = createServer(lightpress(allowedMethods(["GET"], hello)));
+server.listen(8080);
+
+```
+
+The `allowedMethods` function is a factory that takes an array of allowed HTTP
+methods and a handler. It creates a new handler that will invoke the one passed
+as argument, only if the method of the incoming request is included in the array
+of allowed methods. Otherwise, a `Method Not Allowed` error is thrown.
+
+## Custom Data
+
+The request info object can be used to pass custom data down the handler chain.
+While it is technically possible to create a new info object whenever you pass
+it on to another handler, keep in mind, that the `sendResult` and `sendError`
+functions will always receive a reference the originally created object.
+Therefor, changes to info object that have been made after breaking reference
+will not be available inside these two functions.
+
+## Error Handling
+
+Since you can override the default `sendError` function, a natural idea that
+comes in mind is to handle all application specific errors there. While being a
+completely valid option, espacially if you're only dealing with a single error
+format (e.g. an API always returns a JSON representation), this might become
+messi when things get more complex.
+
+Instead, the recommended way is to create specialized guard-handlers which will
+wrap the original handler and convert the occuring errors to a regular result.
+This way you can wrap your application inside a guard that will respond with an
+HTML result and your API handle with another guard that will respond with a JSON
+result, leaving the `sendError` function to deal with unexpected behaviour.
