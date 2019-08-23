@@ -14,7 +14,7 @@ export type LightpressOptions<T extends LightpressInfo> = {
 export function lightpress<T extends LightpressInfo = LightpressInfo>(
   handler: LightpressHandler,
   options: LightpressOptions<T> = {}
-): (request: IncomingMessage, response: ServerResponse) => void {
+): (request: IncomingMessage, response: ServerResponse) => Promise<void> {
   if ("function" !== typeof handler) {
     throw new TypeError("handler must be a function");
   }
@@ -27,7 +27,9 @@ export function lightpress<T extends LightpressInfo = LightpressInfo>(
     const url = parse(request.url || "/", true)
     const info = { request, timestamp, url } as T;
 
-    new Promise<LightpressResult>(resolve => resolve(handler(info)))
+    // IMPORTANT: This promise is returned so it can be awaited directly inside
+    // unit tests, instead of using a timeout.
+    return new Promise<LightpressResult>(resolve => resolve(handler(info)))
       .then(result => sendResult(response, info, result))
       .catch(error => sendError(response, info, error));
   };
