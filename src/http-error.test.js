@@ -1,58 +1,60 @@
 const { STATUS_CODES } = require("http");
 const { HttpError } = require("./http-error");
 
-describe("The `HttpError` constructor", () => {
-  it("should have a `fromError` method to convert errors", () => {
+describe("HttpError", () => {
+  it("has static `fromError` method", () => {
     expect(typeof HttpError.fromError).toBe("function");
   });
-});
 
-describe("The `HttpError` instance", () => {
-  const code = 400;
-  const message = "Custom Error";
-  const e1 = new HttpError(code);
-  const e2 = new HttpError(code, message);
-  const e3 = HttpError.fromError(new Error(message));
-  const e4 = HttpError.fromError(new Error(message), 400);
+  it("static `fromError` ignores `HttpError` instance", () => {
+    const errorFixture = new HttpError(400);
 
-  it("is an instance of `Error`", () => {
-    expect(e1).toBeInstanceOf(Error);
+    expect(HttpError.fromError(errorFixture)).toBe(errorFixture);
   });
 
-  it("has the error code passed to the constructor", () => {
-    expect(e1.code).toBe(code);
+  it("static `fromError` converts to an `HttpError`", () => {
+    const errorFixture = new Error("Some Error");
+
+    expect(HttpError.fromError(errorFixture)).toBeInstanceOf(HttpError);
   });
 
-  it("defaults to the corresponding HTTP message", () => {
-    expect(e1.message).toBe(STATUS_CODES[code]);
+  it("static `fromError` sets error message", () => {
+    const messageFixture = "Some Error";
+
+    expect(HttpError.fromError(new Error(messageFixture)).message).toBe(messageFixture);
   });
 
-  it("has the error message passed to the constructor", () => {
-    expect(e2.message).toBe(message);
+  it("static `fromError` accepts optional code", () => {
+    expect(HttpError.fromError(new Error("Some Error"), 400).code).toBe(400);
   });
 
-  it("does not convert an `HttpError`", () => {
-    expect(HttpError.fromError(e1)).toBe(e1);
+  it("constructs to an instance of `Error`", () => {
+    expect(new HttpError(400)).toBeInstanceOf(Error);
   });
 
-  it("has default code `500` when converted from non `HttpError`", () => {
-    expect(e3.code).toBe(500);
+  it("propagates error code", () => {
+    expect(new HttpError(400).code).toBe(400);
   });
 
-  it("has the error message from the given error when converted", () => {
-    expect(e3.message).toBe(message);
-    expect(e4.message).toBe(message);
+  it("defaults to standard HTTP message", () => {
+    expect(new HttpError(400).message).toBe(STATUS_CODES[400]);
   });
 
-  it("has a custom code when defined and converted from non `HttpError`", () => {
-    expect(e4.code).toBe(400);
+  it("propagates error message", () => {
+    expect(new HttpError(400, "Custom Error").message).toBe("Custom Error");
   });
 
   it("is serializable to JSON", () => {
-    expect(typeof e2.toJSON).toBe("function");
+    expect(typeof (new HttpError(400)).toJSON).toBe("function");
   });
 
   it("serializes to the expected JSON object", () => {
-    expect(e2.toJSON()).toEqual({ code, error: message });
+    const codeFixture = 400;
+    const messageFixture = "Some Error";
+
+    expect(new HttpError(codeFixture, messageFixture).toJSON()).toEqual({
+      code: codeFixture,
+      error: messageFixture,
+    });
   });
 });
