@@ -6,7 +6,7 @@ import { LightpressResult } from "./types/lightpress-result";
 export function sendResult<T extends LightpressInfo = LightpressInfo>(response: ServerResponse, _info: T, result: LightpressResult): void {
   const statusCode = result && result.statusCode ? result.statusCode : 200;
   const headers = result && result.headers ? result.headers : null;
-  const data = result && result.body ? result.body : null;
+  const body = result && result.body ? result.body : null;
 
   if (headers) {
     response.writeHead(statusCode, headers);
@@ -14,9 +14,9 @@ export function sendResult<T extends LightpressInfo = LightpressInfo>(response: 
     response.statusCode = statusCode;
   }
 
-  if (data instanceof Readable) {
-    data.pipe(response);
+  if (body instanceof Readable) {
+    body.pipe(response);
   } else {
-    response.end(data);
+    response.end(body);
   }
 }
