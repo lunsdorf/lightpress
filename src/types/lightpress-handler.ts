@@ -1,6 +1,6 @@
-import { LightpressInfo } from "./lightpress-info";
+import { LightpressContext } from "./lightpress-context";
 import { LightpressResult } from "./lightpress-result";
 
-export type LightpressHandler<T extends LightpressInfo = LightpressInfo> = (info: T) => (
+export type LightpressHandler<T extends LightpressContext = LightpressContext> = (context: T) => (
   LightpressResult | Promise<LightpressResult>
 );
