@@ -1,7 +1,7 @@
 import { IncomingMessage } from "http";
 import { UrlWithParsedQuery } from "url";
 
-export type LightpressInfo = {
+export type LightpressContext = {
   /** The incoming server request. */
   request: IncomingMessage;
 

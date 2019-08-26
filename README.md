@@ -19,12 +19,13 @@ $ npm install --save lightpress
 
 ## Getting Started
 
-In lightpress a request handler is a plain function that takes a request info
+In lightpress a request handler is a plain function that takes a request context
 object as single argument and returns a result or a promise that resolves
 to a result.
 
-By default, the request info object contains the incoming request and a
-timestamp, but can be augmented to fit the needs of your application.
+By default, the request context object contains a timestand, URL object and a
+reference to the incoming request. You can also augment the context object with
+custom data to fit the needs of your application.
 
 The handler's outcome, if any, has to be an object that might contain a
 `statusCode`, `headers` and a `body`.
@@ -33,13 +34,13 @@ The handler's outcome, if any, has to be an object that might contain a
 import { createServer } from "http";
 import { lightpress } from "lightpress";
 
-function hello(info) {
+function hello(context) {
   return {
     statusCode: 200,
     headers: {
       "Content-Type": "text/plain",
     },
-    body: `Hello from '${info.request.url}' at ${new Date(info.timestamp).toLocaleTimeString()}.`
+    body: `Hello from '${context.request.url}' at ${new Date(context.timestamp).toLocaleTimeString()}.`
   }
 }
 
@@ -62,9 +63,9 @@ import { createServer } from "http";
 import { lightpress, HttpError } from "lightpress";
 
 function allowedMethods(methods, handler) {
-  return info => {
-    if (methods.include(info.request.method)) {
-      return handler(info)
+  return context => {
+    if (methods.include(context.request.method)) {
+      return handler(context)
     }
 
     throw new HttpError(405);
@@ -85,12 +86,13 @@ of allowed methods. Otherwise, a `Method Not Allowed` error is thrown.
 
 ## Custom Data
 
-The request info object can be used to pass custom data down the handler chain.
-While it is technically possible to create a new info object whenever you pass
-it on to another handler, keep in mind, that the `sendResult` and `sendError`
-functions will always receive a reference the originally created object.
-Therefor, changes to info object that have been made after breaking reference
-will not be available inside these two functions.
+The request context object can be used to pass custom data down the handler
+chain. While it is technically possible to create a new context object whenever
+you pass it on to another handler, keep in mind, that the `sendResult` and
+`sendError` functions will always receive a reference the originally created
+object. Therefor, changes to request object that have been made after breaking
+reference will not be available inside these two functions and might break some
+3rd-party packages that rely on using the same reference.
 
 ## Error Handling
 

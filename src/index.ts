@@ -1,6 +1,6 @@
 // Export typings
 export * from "./types/lightpress-handler";
-export * from "./types/lightpress-info";
+export * from "./types/lightpress-context";
 export * from "./types/lightpress-result";
 
 // Export implementation
