@@ -1,7 +1,9 @@
+jest.mock('./create-context');
 jest.mock('./send-result');
 jest.mock('./send-error');
 
 const { lightpress } = require("./lightpress");
+const { createContext } = require('./create-context');
 const { sendError } = require('./send-error');
 const { sendResult } = require('./send-result');
 
@@ -19,21 +21,54 @@ describe("lightpress", () => {
   it("calls given handler", async () => {
     const requestFixture = {};
     const responseFixture = {};
+    const contextFixture = {};
     const handlerMock = jest.fn();
+
+    createContext.mockImplementation(() => contextFixture);
 
     await lightpress(handlerMock)(
       requestFixture,
       responseFixture
     );
 
-    expect(handlerMock).toHaveBeenCalledTimes(1)
-    expect(handlerMock).toHaveBeenCalledWith(expect.objectContaining({
-      timestamp: expect.any(Number),
-      request: requestFixture,
-    }))
+    expect(handlerMock).toHaveBeenCalledTimes(1);
+    expect(handlerMock).toHaveBeenCalledWith(contextFixture);
   });
 
-  it("calls default `sendResult`", async () => {
+  it("calls `createContext`", async () => {
+    const requestFixture = {};
+    const responseFixture = {};
+
+    await lightpress(() => null)(
+      requestFixture,
+      responseFixture
+    );
+
+    expect(createContext).toHaveBeenCalledTimes(1)
+    expect(createContext).toHaveBeenCalledWith(
+      requestFixture,
+      responseFixture
+    );
+  });
+
+  it("calls `createContext` defined via options", async () => {
+    const requestFixture = {};
+    const responseFixture = {};
+    const createContextMock = jest.fn();
+
+    await lightpress(() => null, { createContext: createContextMock })(
+      requestFixture,
+      responseFixture
+    );
+
+    expect(createContextMock).toHaveBeenCalledTimes(1)
+    expect(createContextMock).toHaveBeenCalledWith(
+      requestFixture,
+      responseFixture
+    );
+  });
+
+  it("calls `sendResult`", async () => {
     const requestFixture = {};
     const responseFixture = {};
     const resultFixture = {};
@@ -46,39 +81,11 @@ describe("lightpress", () => {
     expect(sendResult).toHaveBeenCalledTimes(1)
     expect(sendResult).toHaveBeenCalledWith(
       responseFixture,
-      expect.objectContaining({
-        request: requestFixture,
-        timestamp: expect.any(Number),
-        url: expect.any(Object),
-      }),
       resultFixture
     );
   });
 
-  it("calls custom `sendResult`", async () => {
-    const requestFixture = {};
-    const responseFixture = {};
-    const resultFixture = {};
-    const sendResultMock = jest.fn();
-
-    await lightpress(() => resultFixture, { sendResult: sendResultMock })(
-      requestFixture,
-      responseFixture
-    );
-
-    expect(sendResultMock).toHaveBeenCalledTimes(1)
-    expect(sendResultMock).toHaveBeenCalledWith(
-      responseFixture,
-      expect.objectContaining({
-        request: requestFixture,
-        timestamp: expect.any(Number),
-        url: expect.any(Object),
-      }),
-      resultFixture
-    );
-  });
-
-  it("calls default `sendError`", async () => {
+  it("calls `sendError`", async () => {
     const requestFixture = {};
     const responseFixture = {};
     const errorFixture = new Error("error");
@@ -91,34 +98,6 @@ describe("lightpress", () => {
     expect(sendError).toHaveBeenCalledTimes(1)
     expect(sendError).toHaveBeenCalledWith(
       responseFixture,
-      expect.objectContaining({
-        request: requestFixture,
-        timestamp: expect.any(Number),
-        url: expect.any(Object),
-      }),
-      errorFixture
-    );
-  });
-
-  it("calls custom `sendError`", async () => {
-    const requestFixture = {};
-    const responseFixture = {};
-    const errorFixture = new Error("error");
-    const sendErrorMock = jest.fn();
-
-    await lightpress(() => { throw errorFixture }, { sendError: sendErrorMock })(
-      requestFixture,
-      responseFixture
-    );
-
-    expect(sendErrorMock).toHaveBeenCalledTimes(1)
-    expect(sendErrorMock).toHaveBeenCalledWith(
-      responseFixture,
-      expect.objectContaining({
-        request: requestFixture,
-        timestamp: expect.any(Number),
-        url: expect.any(Object),
-      }),
       errorFixture
     );
   });
@@ -136,11 +115,6 @@ describe("lightpress", () => {
     expect(sendResult).toHaveBeenCalledTimes(1)
     expect(sendResult).toHaveBeenCalledWith(
       responseFixture,
-      expect.objectContaining({
-        request: requestFixture,
-        timestamp: expect.any(Number),
-        url: expect.any(Object),
-      }),
       resultFixture
     );
   });
@@ -158,11 +132,6 @@ describe("lightpress", () => {
     expect(sendError).toHaveBeenCalledTimes(1)
     expect(sendError).toHaveBeenCalledWith(
       responseFixture,
-      expect.objectContaining({
-        request: requestFixture,
-        timestamp: expect.any(Number),
-        url: expect.any(Object),
-      }),
       errorFixture
     );
   });

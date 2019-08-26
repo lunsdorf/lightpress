@@ -16,7 +16,7 @@ describe("sendResult", () => {
   })
 
   it("sends defaults", () => {
-    sendResult(response, {}, null);
+    sendResult(response, null);
 
     expect(response.statusCode).toBe(200);
     expect(response.writeHead).not.toHaveBeenCalled()
@@ -26,7 +26,7 @@ describe("sendResult", () => {
   it("sends status code", () => {
     const statusCodeFixture = 400;
 
-    sendResult(response, {}, { statusCode: statusCodeFixture });
+    sendResult(response, { statusCode: statusCodeFixture });
 
     expect(response.statusCode).toBe(statusCodeFixture);
     expect(response.writeHead).not.toHaveBeenCalled()
@@ -36,7 +36,7 @@ describe("sendResult", () => {
   it("sends headers", () => {
     const headersFixture = {};
 
-    sendResult(response, {}, { headers: headersFixture });
+    sendResult(response, { headers: headersFixture });
 
     expect(response.statusCode).toBeUndefined();
     expect(response.writeHead).toHaveBeenCalledWith(200, headersFixture);
@@ -47,7 +47,7 @@ describe("sendResult", () => {
     const statusCodeFixture = 400;
     const headersFixture = {};
 
-    sendResult(response, {}, {
+    sendResult(response, {
       statusCode: statusCodeFixture,
       headers: headersFixture,
     });
@@ -60,7 +60,7 @@ describe("sendResult", () => {
   it("sends body string", () => {
     const bodyFixture = "Hello World!";
 
-    sendResult(response, {}, { body: bodyFixture });
+    sendResult(response, { body: bodyFixture });
 
     expect(response.statusCode).toBe(200);
     expect(response.writeHead).not.toHaveBeenCalled();
@@ -70,7 +70,7 @@ describe("sendResult", () => {
   it("sends body buffer", () => {
     const bodyFixture = Buffer.from("Hello World!");
 
-    sendResult(response, {}, { body: bodyFixture });
+    sendResult(response, { body: bodyFixture });
 
     expect(response.statusCode).toBe(200);
     expect(response.writeHead).not.toHaveBeenCalled();
@@ -81,7 +81,7 @@ describe("sendResult", () => {
   it("sends body stream", () => {
     const bodyFixture = new Readable();
 
-    sendResult(response, {}, { body: bodyFixture });
+    sendResult(response, { body: bodyFixture });
 
     expect(response.statusCode).toBe(200);
     expect(response.writeHead).not.toHaveBeenCalled();

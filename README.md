@@ -23,9 +23,8 @@ In lightpress a request handler is a plain function that takes a request context
 object as single argument and returns a result or a promise that resolves
 to a result.
 
-By default, the request context object contains a timestand, URL object and a
-reference to the incoming request. You can also augment the context object with
-custom data to fit the needs of your application.
+By default, the request context object contains a URL object and a reference to
+the incoming request.
 
 The handler's outcome, if any, has to be an object that might contain a
 `statusCode`, `headers` and a `body`.
@@ -40,7 +39,7 @@ function hello(context) {
     headers: {
       "Content-Type": "text/plain",
     },
-    body: `Hello from '${context.request.url}' at ${new Date(context.timestamp).toLocaleTimeString()}.`
+    body: `Hello from '${context.url.pathname}'.`
   }
 }
 
@@ -64,7 +63,7 @@ import { lightpress, HttpError } from "lightpress";
 
 function allowedMethods(methods, handler) {
   return context => {
-    if (methods.include(context.request.method)) {
+    if (methods.includes(context.request.method)) {
       return handler(context)
     }
 
@@ -76,7 +75,6 @@ function allowedMethods(methods, handler) {
 
 const server = createServer(lightpress(allowedMethods(["GET"], hello)));
 server.listen(8080);
-
 ```
 
 The `allowedMethods` function is a factory that takes an array of allowed HTTP
@@ -96,14 +94,44 @@ reference will not be available inside these two functions and might break some
 
 ## Error Handling
 
-Since you can override the default `sendError` function, a natural idea that
-comes in mind is to handle all application specific errors there. While being a
-completely valid option, espacially if you're only dealing with a single error
-format (e.g. an API always returns a JSON representation), this might become
-messi when things get more complex.
+In lightpress, errors are handled using guards. A guard itself is just another
+handler that catches the error that was thrown from the inner handler and
+converts it to a result. As with any other handler, guards can be nested, giving
+you fine grained control on how the error flows. You could also convert and
+re-throw the error leaving it to the outer handler to handle it.
 
-Instead, the recommended way is to create specialized guard-handlers which will
-wrap the original handler and convert the occuring errors to a regular result.
-This way you can wrap your application inside a guard that will respond with an
-HTML result and your API handle with another guard that will respond with a JSON
-result, leaving the `sendError` function to deal with unexpected behaviour.
+```js
+import { createServer } from "http";
+import { lightpress, HttpError } from "lightpress";
+
+function sendError(handler) {
+  return context => new Promise(resolve => resolve(handler(context))).catch(error => {
+    const httpError = HttpError.fromError(error);
+    const message = httpError.code === 405
+      ? "Better watch your verbs."
+      : "My bad."
+    const body = Buffer.from(message);
+
+    return {
+      statusCode: httpError.code,
+      headers: {
+        "Content-Type": "text/plain",
+        "Content-Length": body.length,
+      },
+      body,
+    };
+  });
+}
+
+// define handlers from above ...
+
+const server = createServer(
+  lightpress(
+    sendError(
+      allowedMethods(["GET"], hello)
+    )
+  )
+);
+
+server.listen(8080);
+```
