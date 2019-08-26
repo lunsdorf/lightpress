@@ -9,12 +9,11 @@ describe("sendError", () => {
 
   it("delegates to `resultHandler`", () => {
     const responseFixture = {};
-    const contextFixture = {};
     const codeFixture = 400;
 
-    sendError(responseFixture, contextFixture, new HttpError(400));
+    sendError(responseFixture, new HttpError(400));
 
     expect(sendResult).toHaveBeenCalledTimes(1);
-    expect(sendResult).toHaveBeenCalledWith(responseFixture, contextFixture, { statusCode: codeFixture });
+    expect(sendResult).toHaveBeenCalledWith(responseFixture, { statusCode: codeFixture });
   });
 });
