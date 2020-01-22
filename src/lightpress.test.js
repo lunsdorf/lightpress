@@ -1,11 +1,11 @@
-jest.mock('./create-context');
-jest.mock('./send-result');
-jest.mock('./send-error');
+jest.mock("./create-context");
+jest.mock("./send-result");
+jest.mock("./send-error");
 
 const { lightpress } = require("./lightpress");
-const { createContext } = require('./create-context');
-const { sendError } = require('./send-error');
-const { sendResult } = require('./send-result');
+const { createContext } = require("./create-context");
+const { sendError } = require("./send-error");
+const { sendResult } = require("./send-result");
 
 describe("lightpress", () => {
   beforeEach(() => jest.resetAllMocks());

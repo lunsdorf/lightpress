@@ -1,7 +1,7 @@
-jest.mock('stream');
+jest.mock("stream");
 
-const { Readable } = require('stream');
-const { sendResult } = require('./send-result');
+const { Readable } = require("stream");
+const { sendResult } = require("./send-result");
 
 describe("sendResult", () => {
   const response = {
