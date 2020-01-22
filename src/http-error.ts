@@ -1,44 +1,33 @@
 import { STATUS_CODES } from "http";
+import { LightpressResult } from "./types/lightpress-result";
 
 export class HttpError extends Error {
   /** Error type name. */
-  public name: string = "HttpError";
+  public readonly name: string = "HttpError";
 
   /** The error's HTTP code. */
   public code: number;
 
   /**
-   * Converts the given error to an HTTP error instance.
-   * @param error The error to convert. If this is already an HTTP error
-   * instance, the same reference will be returned without converting it.
-   * @param code The HTTP code for the newly created HTTP error.
-   */
-  public static fromError(error: Error, code = 500): HttpError {
-    if (error instanceof HttpError) {
-      return error;
-    } else {
-      return new HttpError(code, error.message);
-    }
-  }
-
-  /**
    * The HTTP error represents an error based on the HTTP error codes. It can be
    * used as an errors response.
    * @param code The error code used as HTTP status code.
-   * @param [message] Optional error message. If no message is given, the
-   * default message of the given HTTP code is used.
    */
-  public constructor(code: number, message?: string) {
-    super(message || STATUS_CODES[code]);
+  public constructor(code: number) {
+    super(STATUS_CODES[code]);
+
+    if (Error.captureStackTrace) {
+      Error.captureStackTrace(this, this.constructor);
+    }
 
     this.code = code;
   }
 
-  /** Converts the error to a JSON object representation. */
-  public toJSON(): { code: number, error: string } {
+  /** Converts the error to a result object. */
+  public toResult(): LightpressResult {
     return {
-      code: this.code,
-      error: this.message,
+      statusCode: this.code,
+      body: this.message,
     };
   }
 }

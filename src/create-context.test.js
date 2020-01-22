@@ -1,7 +1,7 @@
-jest.mock('url');
+jest.mock("url");
 
-const { parse } = require('url');
-const { createContext } = require('./create-context');
+const { parse } = require("url");
+const { createContext } = require("./create-context");
 
 describe("createContext", () => {
   beforeEach(() => jest.resetAllMocks());
