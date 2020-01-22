@@ -58,8 +58,7 @@ requests. To achieve this we could simply check the request method inside our
 separate handler which only cares about request methods.
 
 ```js
-import { createServer } from "http";
-import { lightpress, HttpError } from "lightpress";
+// ...
 
 function allowedMethods(methods, handler) {
   return context => {
@@ -71,10 +70,9 @@ function allowedMethods(methods, handler) {
   }
 }
 
-// define hello handler from above ...
+// ...
 
 const server = createServer(lightpress(allowedMethods(["GET"], hello)));
-server.listen(8080);
 ```
 
 The `allowedMethods` function is a factory that takes an array of allowed HTTP
@@ -97,14 +95,12 @@ reference will not be available inside these two functions and might break some
 In lightpress, errors are handled using guards. A guard itself is just another
 handler that catches the error that was thrown from the inner handler and
 converts it to a result. As with any other handler, guards can be nested, giving
-you fine grained control on how the error flows. You could also convert and
-re-throw the error leaving it to the outer handler to handle it.
+you fine grained control on how the error flows.
 
 ```js
-import { createServer } from "http";
-import { lightpress, HttpError } from "lightpress";
+// ...
 
-function sendError(handler) {
+function catchError(handler) {
   return context => new Promise(resolve => resolve(handler(context))).catch(error => {
     const httpError = HttpError.fromError(error);
     const message = httpError.code === 405
@@ -123,15 +119,16 @@ function sendError(handler) {
   });
 }
 
-// define handlers from above ...
+// ...
 
 const server = createServer(
   lightpress(
-    sendError(
+    catchError(
       allowedMethods(["GET"], hello)
     )
   )
 );
-
-server.listen(8080);
 ```
+
+If an error is not handled, `lightpress` will catch it and send a plain internal
+server error response.
