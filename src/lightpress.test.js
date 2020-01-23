@@ -88,7 +88,7 @@ describe("lightpress", () => {
   it("calls `sendError`", async () => {
     const requestFixture = {};
     const responseFixture = {};
-    const errorFixture = new Error("error");
+    const errorFixture = { toResult: jest.fn() };
 
     await lightpress(() => { throw errorFixture })(
       requestFixture,
@@ -122,7 +122,7 @@ describe("lightpress", () => {
   it("supports async error", async () => {
     const requestFixture = {};
     const responseFixture = {};
-    const errorFixture = new Error("error");
+    const errorFixture = { toResult: jest.fn() };
 
     await lightpress(() => Promise.reject(errorFixture))(
       requestFixture,

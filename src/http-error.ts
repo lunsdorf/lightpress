@@ -2,32 +2,25 @@ import { STATUS_CODES } from "http";
 import { LightpressResult } from "./types/lightpress-result";
 
 export class HttpError extends Error {
-  /** Error type name. */
   public readonly name: string = "HttpError";
-
-  /** The error's HTTP code. */
-  public code: number;
+  public readonly statusCode: number;
 
   /**
-   * The HTTP error represents an error based on the HTTP error codes. It can be
-   * used as an errors response.
-   * @param code The error code used as HTTP status code.
+   * The HTTP error represents an error based on the HTTP error codes.
+   * @param statusCode An HTTP status code
    */
-  public constructor(code: number) {
-    super(STATUS_CODES[code]);
+  public constructor(statusCode: number) {
+    super(STATUS_CODES[statusCode]);
 
     if (Error.captureStackTrace) {
       Error.captureStackTrace(this, this.constructor);
     }
 
-    this.code = code;
+    this.statusCode = statusCode;
   }
 
-  /** Converts the error to a result object. */
+  /** Converts the error to an HTTP result object. */
   public toResult(): LightpressResult {
-    return {
-      statusCode: this.code,
-      body: this.message,
-    };
+    return { statusCode: this.statusCode };
   }
 }

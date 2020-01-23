@@ -6,8 +6,8 @@ describe("HttpError", () => {
     expect(new HttpError(400)).toBeInstanceOf(Error);
   });
 
-  it("propagates error code", () => {
-    expect(new HttpError(400).code).toBe(400);
+  it("has the correct statusCode", () => {
+    expect(new HttpError(400).statusCode).toBe(400);
   });
 
   it("defaults to standard HTTP message", () => {
@@ -23,7 +23,6 @@ describe("HttpError", () => {
 
     expect(new HttpError(codeFixture).toResult()).toEqual({
       statusCode: codeFixture,
-      body: STATUS_CODES[codeFixture],
     });
   });
 });
