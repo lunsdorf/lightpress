@@ -3,22 +3,14 @@ import { HttpError } from "./http-error";
 import { sendResult } from "./send-result";
 
 export function sendError(response: ServerResponse, error: Error): void {
+  // TODO: investigate alternatives for application specific debugging/logging
+  if (process.env.LIGHTPRESS_ERROR === "verbose") {
+    console.error(error);
+  }
+
   if (error instanceof HttpError) {
     sendResult(response, error.toResult());
-    return;
+  } else {
+    sendResult(response, { statusCode: 500 });
   }
-
-  // TODO: evaluate alternative implementations that don't rely on NODE_ENV
-  if (process.env.NODE_ENV === "development") {
-    console.error(error);
-
-    sendResult(response, {
-      statusCode: 500,
-      body: `Unhandled error: ${error}`,
-    });
-
-    return;
-  }
-
-  sendResult(response, new HttpError(500).toResult());
 }

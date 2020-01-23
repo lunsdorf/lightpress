@@ -98,12 +98,13 @@ converts it to a result. As with any other handler, guards can be nested, giving
 you fine grained control on how the error flows.
 
 ```js
+import { HttpError } from "lightpress";
+
 // ...
 
 function catchError(handler) {
   return context => new Promise(resolve => resolve(handler(context))).catch(error => {
-    const httpError = HttpError.fromError(error);
-    const message = httpError.code === 405
+    const message = error instanceof HttpError && error.statusCode === 405
       ? "Better watch your verbs."
       : "My bad."
     const body = Buffer.from(message);
@@ -132,3 +133,12 @@ const server = createServer(
 
 If an error is not handled, `lightpress` will catch it and send a plain internal
 server error response.
+
+## Environment Variables
+
+Lightpress reacts to certain environment variables that can be used to control
+the internal behaviour.
+
+| Variable Name      | Variable Value | Description
+|:-------------------|:---------------|:----------------------------------------
+| `LIGHTPRESS_ERROR` | `verbose`      | Writes unhandled errors to `console.error`.
