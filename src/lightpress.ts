@@ -22,7 +22,7 @@ export function lightpress<T extends LightpressContext = LightpressContext>(
   return (request: IncomingMessage, response: ServerResponse) => {
     // Directly return the promise so that it's resolution can be tracked
     // outside, e.g. in unit tests.
-    return Promise.resolve<LightpressContext>(createContext(request, response))
+    return Promise.resolve(createContext(request, response))
       .then(context => handler(context as T)) // FIXME: infer type
       .then(result => sendResult(response, result))
       .catch(error => sendError(response, error));

@@ -10,7 +10,7 @@ module.exports = {
   testMatch: [
     "**/*.test.js",
   ],
-  transform: {
-    "^.+\\.(js|ts)$": "babel-jest"
-  }
+  "transform": {
+    "^.+\\.(js|ts)$": "@sucrase/jest-plugin",
+  },
 };

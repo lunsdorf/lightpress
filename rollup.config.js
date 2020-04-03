@@ -1,8 +1,6 @@
 const importResolver = require("rollup-plugin-import-resolver");
-const babel = require("rollup-plugin-babel");
+const sucrase = require("@rollup/plugin-sucrase");
 const pkg = require("./package.json");
-
-const FILE_EXTENSIONS = [".ts", "js"];
 
 module.exports = {
   input: "src/index.ts",
@@ -12,7 +10,7 @@ module.exports = {
   ],
   external: require("module").builtinModules,
   plugins: [
-    importResolver({ extensions: FILE_EXTENSIONS }),
-    babel({ extensions: FILE_EXTENSIONS }),
+    importResolver({ extensions: [".ts", "js"] }),
+    sucrase({ transforms: ["typescript"] }),
   ],
 };
