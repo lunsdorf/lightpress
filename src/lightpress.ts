@@ -10,7 +10,7 @@ export type LightpressOptions<T extends LightpressContext> = {
 };
 
 export function lightpress<T extends LightpressContext = LightpressContext>(
-  handler: LightpressHandler,
+  handler: LightpressHandler<T>,
   options: LightpressOptions<T> = {}
 ): (request: IncomingMessage, response: ServerResponse) => Promise<void> {
   if ("function" !== typeof handler) {
@@ -20,10 +20,10 @@ export function lightpress<T extends LightpressContext = LightpressContext>(
   const createContext = options.createContext || defaultCreateContext;
 
   return (request: IncomingMessage, response: ServerResponse) => {
-    // IMPORTANT: This promise is returned so it can be awaited directly inside
-    // unit tests, instead of using a timeout.
+    // Directly return the promise so that it's resolution can be tracked
+    // outside, e.g. in unit tests.
     return Promise.resolve<LightpressContext>(createContext(request, response))
-      .then(context => handler(context))
+      .then(context => handler(context as T)) // FIXME: infer type
       .then(result => sendResult(response, result))
       .catch(error => sendError(response, error));
   };
