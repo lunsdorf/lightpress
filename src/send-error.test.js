@@ -13,13 +13,17 @@ describe("sendError", () => {
     sendError(responseFixture, new HttpError(400));
 
     expect(sendResult).toHaveBeenCalledTimes(1);
-    expect(sendResult).toHaveBeenCalledWith(responseFixture, { statusCode: 400 });
+    expect(sendResult).toHaveBeenCalledWith(responseFixture, {
+      statusCode: 400,
+    });
   });
 
   it("calles `toResult` on HTTP error", () => {
     const resultFixture = {};
     const errorFixture = new HttpError(400);
-    const toResultSpy = jest.spyOn(errorFixture, "toResult").mockImplementation(() => resultFixture);
+    const toResultSpy = jest
+      .spyOn(errorFixture, "toResult")
+      .mockImplementation(() => resultFixture);
 
     sendError({}, errorFixture);
 
@@ -27,7 +31,9 @@ describe("sendError", () => {
   });
 
   it("writes to `console.error` if `LIGHTPRESS_ERROR` set to `verbose`", () => {
-    const consoleSpy = jest.spyOn(global.console, "error").mockImplementation(() => void 0);
+    const consoleSpy = jest
+      .spyOn(global.console, "error")
+      .mockImplementation(() => void 0);
     const errorFixture = new HttpError(400);
 
     process.env.LIGHTPRESS_ERROR = "verbose";
@@ -41,7 +47,9 @@ describe("sendError", () => {
   });
 
   it("doesn't write to `console.error` if `LIGHTPRESS_ERROR` not set", () => {
-    const consoleSpy = jest.spyOn(global.console, "error").mockImplementation(() => void 0);
+    const consoleSpy = jest
+      .spyOn(global.console, "error")
+      .mockImplementation(() => void 0);
 
     process.env.LIGHTPRESS_ERROR = void 0;
 
@@ -55,6 +63,8 @@ describe("sendError", () => {
 
     sendError(responseFixture, new Error("some error"));
 
-    expect(sendResult).toHaveBeenCalledWith(responseFixture, { statusCode: 500 });
+    expect(sendResult).toHaveBeenCalledWith(responseFixture, {
+      statusCode: 500,
+    });
   });
 });

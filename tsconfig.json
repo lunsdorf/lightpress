@@ -11,13 +11,7 @@
     "outDir": "./lib",
     "strict": true,
     "target": "esnext",
-    "types": [
-      "node"
-    ],
+    "types": ["node"]
   },
-  "exclude": [
-    "node_modules/",
-    "lib/",
-    "tmp/"
-  ]
+  "exclude": ["node_modules/", "lib/", "tmp/"]
 }

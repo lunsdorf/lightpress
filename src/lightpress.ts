@@ -6,7 +6,10 @@ import { sendError } from "./send-error";
 import { sendResult } from "./send-result";
 
 export type LightpressOptions<T extends LightpressContext> = {
-  createContext?: (request: IncomingMessage, response: ServerResponse) => T | Promise<T>;
+  createContext?: (
+    request: IncomingMessage,
+    response: ServerResponse
+  ) => T | Promise<T>;
 };
 
 export function lightpress<T extends LightpressContext = LightpressContext>(
@@ -23,8 +26,8 @@ export function lightpress<T extends LightpressContext = LightpressContext>(
     // Directly return the promise so that it's resolution can be tracked
     // outside, e.g. in unit tests.
     return Promise.resolve(createContext(request, response))
-      .then(context => handler(context as T)) // FIXME: infer type
-      .then(result => sendResult(response, result))
-      .catch(error => sendError(response, error));
+      .then((context) => handler(context as T)) // FIXME: infer type
+      .then((result) => sendResult(response, result))
+      .catch((error) => sendError(response, error));
   };
 }
