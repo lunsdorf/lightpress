@@ -165,6 +165,28 @@ function extractLogger(context) {
 If the `log` function wasn't injected into the context object, a warning is
 printed and a `noop`-fallback is return instead.
 
+```js
+function hello(context) {
+  const log = extractLogger(context);
+
+  log("Serving request from hello handler.");
+
+  return {
+    statusCode: 200,
+    headers: {
+      "Content-Type": "text/plain",
+    },
+    body: `Hello from '${context.request.url}'.`,
+  };
+}
+
+// ...
+
+const server = createServer(
+  lightpress(injectLogger(catchError(allowedMethods(["GET"], hello))))
+);
+```
+
 ## Environment Variables
 
 Lightpress reacts to certain environment variables that can be used to control
