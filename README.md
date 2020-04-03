@@ -3,14 +3,14 @@
 Lightpress is a thin wrapper around node's HTTP handler interface, that let's
 you compose your application's HTTP handlers without overhead.
 
-Although you can use `lightpress` for any kind of application, it was designed
+Although you can use lightpress for any kind of application, it was designed
 with modern API driven web applications in mind. These usually require a single
 handler for serving the (SSR) HTML content, another one for static assets, and
 one or more handlers for data.
 
 ## Installation
 
-You can install `lightpress` from [npmjs.com](https://www.npmjs.com) using your
+You can install lightpress from [npmjs.com](https://www.npmjs.com) using your
 favorite package manager, e.g.
 
 ```bash
@@ -118,7 +118,7 @@ const server = createServer(
 );
 ```
 
-If an error is not handled, `lightpress` will catch it and send a basic error
+If an error is not handled, lightpress will catch it and send a basic error
 response without content.
 
 ## Custom Data
