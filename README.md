@@ -141,10 +141,9 @@ The following function adds a simple `log` function to the context object.
 ```js
 function injectLogger(handler) {
   return context => {
-    const { method } = context.request;
-    const { pathname }  = context.url;
+    const { method, url } = context.request;
 
-    context.log = message => `${new Date()} [${method} ${pathname}]: ${message}`;
+    context.log = message => `${new Date()} [${method} ${url}]: ${message}`;
 
     return handler(context);
   }
