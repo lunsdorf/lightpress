@@ -9,12 +9,18 @@
     "node": ">=10.0.0"
   },
   "scripts": {
-    "build": "rimraf ./lib && rollup -c",
+    "build": "rimraf $npm_package_directories_lib && rollup -c",
     "develop": "rollup -c -w",
     "lint": "tslint -c ./tslint.json ./src/**/*.ts*",
     "prepublish": "npm run test && npm run build && npm run types",
     "test": "jest",
     "types": "tsc --emitDeclarationOnly"
+  },
+  "files": [
+    "lib/**/*"
+  ],
+  "directories": {
+    "lib": "lib"
   },
   "repository": {
     "type": "git",
