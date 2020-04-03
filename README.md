@@ -40,7 +40,7 @@ function hello(context) {
       "Content-Type": "text/plain",
     },
     body: `Hello from '${context.url.pathname}'.`
-  }
+  };
 }
 
 const server = createServer(lightpress(hello));
@@ -63,7 +63,7 @@ separate handler which only cares about request methods.
 function allowedMethods(methods, handler) {
   return context => {
     if (methods.includes(context.request.method)) {
-      return handler(context)
+      return handler(context);
     }
 
     throw new HttpError(405);
@@ -90,6 +90,41 @@ object. Therefor, changes to request object that have been made after breaking
 reference will not be available inside these two functions and might break some
 3rd-party packages that rely on using the same reference.
 
+Instead the recommended way ist to provide a handler function that augments the
+context object. And another function that savely returns the additional data
+from the context object or provides a fallback.
+
+The following function augments the context object with a simple `log` function.
+
+```js
+function injectLogger(handler) {
+  return context => {
+    const { method } = context.request;
+    const { pathname }  = context.url;
+
+    context.log = message => `${new Date()} [${method} ${pathname}]: ${message}`;
+
+    return handler(context);
+  }
+}
+```
+
+The `log` function can be retrieved from the context using the following
+functions. If the `log` function doesn't exists a warning is printed and a
+fallback implementation is provided.
+
+```js
+function extractLogger(context) {
+  if (context.log) {
+    return context.log;
+  }
+
+  console.warn("Trying to access logger, but was not injected.");
+
+  return () => void 0;
+}
+```
+
 ## Error Handling
 
 In lightpress, errors are handled using guards. A guard itself is just another
@@ -106,7 +141,7 @@ function catchError(handler) {
   return context => new Promise(resolve => resolve(handler(context))).catch(error => {
     const message = error instanceof HttpError && error.statusCode === 405
       ? "Better watch your verbs."
-      : "My bad."
+      : "My bad.";
     const body = Buffer.from(message);
 
     return {
