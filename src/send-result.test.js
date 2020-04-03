@@ -13,13 +13,13 @@ describe("sendResult", () => {
   beforeEach(() => {
     response.statusCode = void 0;
     jest.resetAllMocks();
-  })
+  });
 
   it("sends defaults", () => {
     sendResult(response, null);
 
     expect(response.statusCode).toBe(200);
-    expect(response.writeHead).not.toHaveBeenCalled()
+    expect(response.writeHead).not.toHaveBeenCalled();
     expect(response.end).toHaveBeenCalledWith(null);
   });
 
@@ -29,7 +29,7 @@ describe("sendResult", () => {
     sendResult(response, { statusCode: statusCodeFixture });
 
     expect(response.statusCode).toBe(statusCodeFixture);
-    expect(response.writeHead).not.toHaveBeenCalled()
+    expect(response.writeHead).not.toHaveBeenCalled();
     expect(response.end).toHaveBeenCalledWith(null);
   });
 
@@ -53,7 +53,10 @@ describe("sendResult", () => {
     });
 
     expect(response.statusCode).toBeUndefined();
-    expect(response.writeHead).toHaveBeenCalledWith(statusCodeFixture, headersFixture);
+    expect(response.writeHead).toHaveBeenCalledWith(
+      statusCodeFixture,
+      headersFixture
+    );
     expect(response.end).toHaveBeenCalledWith(null);
   });
 
@@ -75,7 +78,6 @@ describe("sendResult", () => {
     expect(response.statusCode).toBe(200);
     expect(response.writeHead).not.toHaveBeenCalled();
     expect(response.end).toHaveBeenCalledWith(bodyFixture);
-
   });
 
   it("sends body stream", () => {

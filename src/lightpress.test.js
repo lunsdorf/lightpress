@@ -26,10 +26,7 @@ describe("lightpress", () => {
 
     createContext.mockImplementation(() => contextFixture);
 
-    await lightpress(handlerMock)(
-      requestFixture,
-      responseFixture
-    );
+    await lightpress(handlerMock)(requestFixture, responseFixture);
 
     expect(handlerMock).toHaveBeenCalledTimes(1);
     expect(handlerMock).toHaveBeenCalledWith(contextFixture);
@@ -39,16 +36,10 @@ describe("lightpress", () => {
     const requestFixture = {};
     const responseFixture = {};
 
-    await lightpress(() => null)(
-      requestFixture,
-      responseFixture
-    );
+    await lightpress(() => null)(requestFixture, responseFixture);
 
-    expect(createContext).toHaveBeenCalledTimes(1)
-    expect(createContext).toHaveBeenCalledWith(
-      requestFixture,
-      responseFixture
-    );
+    expect(createContext).toHaveBeenCalledTimes(1);
+    expect(createContext).toHaveBeenCalledWith(requestFixture, responseFixture);
   });
 
   it("calls `createContext` defined via options", async () => {
@@ -61,7 +52,7 @@ describe("lightpress", () => {
       responseFixture
     );
 
-    expect(createContextMock).toHaveBeenCalledTimes(1)
+    expect(createContextMock).toHaveBeenCalledTimes(1);
     expect(createContextMock).toHaveBeenCalledWith(
       requestFixture,
       responseFixture
@@ -73,16 +64,10 @@ describe("lightpress", () => {
     const responseFixture = {};
     const resultFixture = {};
 
-    await lightpress(() => resultFixture)(
-      requestFixture,
-      responseFixture
-    );
+    await lightpress(() => resultFixture)(requestFixture, responseFixture);
 
-    expect(sendResult).toHaveBeenCalledTimes(1)
-    expect(sendResult).toHaveBeenCalledWith(
-      responseFixture,
-      resultFixture
-    );
+    expect(sendResult).toHaveBeenCalledTimes(1);
+    expect(sendResult).toHaveBeenCalledWith(responseFixture, resultFixture);
   });
 
   it("calls `sendError`", async () => {
@@ -90,16 +75,12 @@ describe("lightpress", () => {
     const responseFixture = {};
     const errorFixture = { toResult: jest.fn() };
 
-    await lightpress(() => { throw errorFixture })(
-      requestFixture,
-      responseFixture
-    );
+    await lightpress(() => {
+      throw errorFixture;
+    })(requestFixture, responseFixture);
 
-    expect(sendError).toHaveBeenCalledTimes(1)
-    expect(sendError).toHaveBeenCalledWith(
-      responseFixture,
-      errorFixture
-    );
+    expect(sendError).toHaveBeenCalledTimes(1);
+    expect(sendError).toHaveBeenCalledWith(responseFixture, errorFixture);
   });
 
   it("supports async result", async () => {
@@ -112,11 +93,8 @@ describe("lightpress", () => {
       responseFixture
     );
 
-    expect(sendResult).toHaveBeenCalledTimes(1)
-    expect(sendResult).toHaveBeenCalledWith(
-      responseFixture,
-      resultFixture
-    );
+    expect(sendResult).toHaveBeenCalledTimes(1);
+    expect(sendResult).toHaveBeenCalledWith(responseFixture, resultFixture);
   });
 
   it("supports async error", async () => {
@@ -129,10 +107,7 @@ describe("lightpress", () => {
       responseFixture
     );
 
-    expect(sendError).toHaveBeenCalledTimes(1)
-    expect(sendError).toHaveBeenCalledWith(
-      responseFixture,
-      errorFixture
-    );
+    expect(sendError).toHaveBeenCalledTimes(1);
+    expect(sendError).toHaveBeenCalledWith(responseFixture, errorFixture);
   });
 });

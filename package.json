@@ -11,7 +11,7 @@
   "scripts": {
     "build": "rimraf $npm_package_directories_lib && rollup -c",
     "develop": "rollup -c -w",
-    "lint": "tslint -c ./tslint.json ./src/**/*.ts*",
+    "format": "prettier --write .",
     "prepublishOnly": "npm run test && npm run build && npm run types",
     "test": "jest",
     "types": "tsc --emitDeclarationOnly"
@@ -45,6 +45,7 @@
     "@types/jest": "25.1.5",
     "@types/node": "13.11.0",
     "jest": "25.2.7",
+    "prettier": "2.0.2",
     "rimraf": "3.0.2",
     "rollup": "2.3.2",
     "rollup-plugin-import-resolver": "1.0.4",

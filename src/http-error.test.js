@@ -15,7 +15,7 @@ describe("HttpError", () => {
   });
 
   it("is serializable to HTTP result", () => {
-    expect(typeof (new HttpError(400)).toResult).toBe("function");
+    expect(typeof new HttpError(400).toResult).toBe("function");
   });
 
   it("serializes to the expected HTTP result object", () => {

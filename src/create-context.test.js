@@ -4,7 +4,7 @@ describe("createContext", () => {
   beforeEach(() => jest.resetAllMocks());
 
   it("creates context object", () => {
-    const requestFixture = {  };
+    const requestFixture = {};
 
     expect(createContext(requestFixture)).toEqual({
       request: requestFixture,
