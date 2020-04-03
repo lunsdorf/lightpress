@@ -39,7 +39,7 @@ function hello(context) {
     headers: {
       "Content-Type": "text/plain",
     },
-    body: `Hello from '${context.url.pathname}'.`
+    body: `Hello from '${context.request.url}'.`
   };
 }
 
@@ -79,51 +79,6 @@ The `allowedMethods` function is a factory that takes an array of allowed HTTP
 methods and a handler. It creates a new handler that will invoke the one passed
 as argument, only if the method of the incoming request is included in the array
 of allowed methods. Otherwise, a `Method Not Allowed` error is thrown.
-
-## Custom Data
-
-The request context object can be used to pass custom data down the handler
-chain. While it is technically possible to create a new context object whenever
-you pass it on to another handler, keep in mind, that the `sendResult` and
-`sendError` functions will always receive a reference the originally created
-object. Therefor, changes to request object that have been made after breaking
-reference will not be available inside these two functions and might break some
-3rd-party packages that rely on using the same reference.
-
-Instead the recommended way ist to provide a handler function that augments the
-context object. And another function that savely returns the additional data
-from the context object or provides a fallback.
-
-The following function augments the context object with a simple `log` function.
-
-```js
-function injectLogger(handler) {
-  return context => {
-    const { method } = context.request;
-    const { pathname }  = context.url;
-
-    context.log = message => `${new Date()} [${method} ${pathname}]: ${message}`;
-
-    return handler(context);
-  }
-}
-```
-
-The `log` function can be retrieved from the context using the following
-functions. If the `log` function doesn't exists a warning is printed and a
-fallback implementation is provided.
-
-```js
-function extractLogger(context) {
-  if (context.log) {
-    return context.log;
-  }
-
-  console.warn("Trying to access logger, but was not injected.");
-
-  return () => void 0;
-}
-```
 
 ## Error Handling
 
@@ -166,8 +121,51 @@ const server = createServer(
 );
 ```
 
-If an error is not handled, `lightpress` will catch it and send a plain internal
-server error response.
+If an error is not handled, `lightpress` will catch it and send a basic error
+response without content.
+
+## Custom Data
+
+The context object, that is passed to each handler can be augmented with custom
+data.  Although it is technically possible to create a new copy of the context
+object whenever you pass it on to another handler, it is most likely not needed.
+Keep also in mind, that some 3rd-party packages might rely on using the same
+reference and could break.
+
+The recommended way to augement the context object, is by providing a handler
+function that manipulates the context object. And another function that savely
+returns the desired data from the context object or provides a fallback.
+
+The following function adds a simple `log` function to the context object.
+
+```js
+function injectLogger(handler) {
+  return context => {
+    const { method } = context.request;
+    const { pathname }  = context.url;
+
+    context.log = message => `${new Date()} [${method} ${pathname}]: ${message}`;
+
+    return handler(context);
+  }
+}
+```
+
+The `log` function can be retrieved from the context using the following
+function. If the `log` function doesn't exists a warning is printed and a
+fallback implementation is provided.
+
+```js
+function extractLogger(context) {
+  if (context.log) {
+    return context.log;
+  }
+
+  console.warn("Trying to access logger, but was not injected.");
+
+  return () => void 0;
+}
+```
 
 ## Environment Variables
 
