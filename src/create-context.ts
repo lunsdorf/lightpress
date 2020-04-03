@@ -1,10 +1,8 @@
-import { IncomingMessage } from "http";
-import { parse } from "url";
+import { IncomingMessage, ServerResponse } from "http";
 import { LightpressContext } from "./types/lightpress-context";
 
-export function createContext(request: IncomingMessage): LightpressContext {
+export function createContext(request: IncomingMessage, _response: ServerResponse): LightpressContext {
   return {
-    url: parse(request.url || "/", true),
     request,
   };
 }

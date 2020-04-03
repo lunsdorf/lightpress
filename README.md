@@ -23,8 +23,8 @@ In lightpress a request handler is a plain function that takes a request context
 object as single argument and returns a result or a promise that resolves
 to a result.
 
-By default, the request context object contains a URL object and a reference to
-the incoming request.
+By default, the request context object only contains  a reference to the
+incoming request.
 
 The handler's outcome, if any, has to be an object that might contain a
 `statusCode`, `headers` and a `body`.
