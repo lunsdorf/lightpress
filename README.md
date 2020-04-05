@@ -1,7 +1,10 @@
 # lightpress
 
-Lightpress is a thin wrapper around node's HTTP handler interface, that let's
-you compose your application's HTTP handlers without overhead.
+Lightpress is a thin wrapper around node's HTTP handler interface, that enables
+you to
+
+- compose a handler tree without overhead
+- write reusable and easy-to-test handler functions
 
 Although you can use lightpress for any kind of application, it was designed
 with modern API driven web applications in mind. These usually require a single

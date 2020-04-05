@@ -1,16 +1,14 @@
-jest.mock("./send-result");
+jest.mock("./create-context");
 jest.mock("./send-error");
+jest.mock("./send-result");
 
+const { createContext } = require("./create-context");
 const { lightpress } = require("./lightpress");
 const { sendError } = require("./send-error");
 const { sendResult } = require("./send-result");
 
 describe("lightpress", () => {
   beforeEach(() => jest.resetAllMocks());
-
-  it("throws an error if no handler was given", () => {
-    expect(() => lightpress()).toThrowError();
-  });
 
   it("returns a function", () => {
     expect(typeof lightpress(() => void 0)).toBe("function");
@@ -19,12 +17,17 @@ describe("lightpress", () => {
   it("calls handler with default context", async () => {
     const requestFixture = {};
     const responseFixture = {};
+    const contextFixture = {};
     const handlerMock = jest.fn();
+
+    createContext.mockImplementationOnce(() => contextFixture);
 
     await lightpress(handlerMock)(requestFixture, responseFixture);
 
+    expect(createContext).toHaveBeenCalledTimes(1);
+    expect(createContext).toHaveBeenCalledWith(requestFixture, responseFixture);
     expect(handlerMock).toHaveBeenCalledTimes(1);
-    expect(handlerMock).toHaveBeenCalledWith({ request: requestFixture });
+    expect(handlerMock).toHaveBeenCalledWith(contextFixture);
   });
 
   it("calls handler with context from `createContext` function", async () => {
@@ -34,10 +37,10 @@ describe("lightpress", () => {
     const createContextMock = jest.fn(() => contextFixture);
     const handlerMock = jest.fn();
 
-    await lightpress(handlerMock, { createContext: createContextMock })(
-      requestFixture,
-      responseFixture
-    );
+    await lightpress({
+      createContext: createContextMock,
+      serve: handlerMock,
+    })(requestFixture, responseFixture);
 
     expect(createContextMock).toHaveBeenCalledTimes(1);
     expect(createContextMock).toHaveBeenCalledWith(
@@ -79,7 +82,7 @@ describe("lightpress", () => {
       throw errorFixture;
     });
 
-    await lightpress(() => null, { createContext: createContextMock })(
+    await lightpress({ createContext: createContextMock, serve: () => null })(
       requestFixture,
       responseFixture
     );
@@ -105,7 +108,7 @@ describe("lightpress", () => {
   it("supports async error", async () => {
     const requestFixture = {};
     const responseFixture = {};
-    const errorFixture = { toResult: jest.fn() };
+    const errorFixture = {};
 
     await lightpress(() => Promise.reject(errorFixture))(
       requestFixture,
