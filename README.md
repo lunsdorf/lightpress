@@ -33,7 +33,7 @@ The handler's outcome, if any, has to be an object that might contain a
 
 ```js
 import { createServer } from "http";
-import { lightpress } from "lightpress";
+import lightpress from "lightpress";
 
 function hello(context) {
   return {
@@ -60,6 +60,8 @@ requests. To achieve this we could simply check the request method inside our
 handler which only cares about request methods.
 
 ```js
+import lightpress, { HttpError } from "lightpress";
+
 // ...
 
 function allowedMethods(methods, handler) {
@@ -90,8 +92,6 @@ converts it to a result. As with any other handler, guards can be nested, giving
 you fine grained control on how the error flows.
 
 ```js
-import { HttpError } from "lightpress";
-
 // ...
 
 function catchError(handler) {
@@ -168,6 +168,8 @@ If no `log` function was injected into the context object, a warning is
 printed and a `noop`-fallback is return instead.
 
 ```js
+//  ...
+
 function hello(context) {
   const log = extractLogger(context);
 
