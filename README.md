@@ -97,18 +97,17 @@ import { HttpError } from "lightpress";
 function catchError(handler) {
   return (context) =>
     new Promise((resolve) => resolve(handler(context))).catch((error) => {
+      const statusCode = error instanceof HttpError ? error.statusCode : 500;
       const message =
-        error instanceof HttpError && error.statusCode === 405
-          ? "Better watch your verbs."
-          : "My bad.";
+        statusCode === 405 ? "Better watch your verbs." : "My bad.";
       const body = Buffer.from(message);
 
       return {
-        statusCode: httpError.code,
         headers: {
           "Content-Type": "text/plain",
           "Content-Length": body.length,
         },
+        statusCode,
         body,
       };
     });
@@ -165,7 +164,7 @@ function extractLogger(context) {
 }
 ```
 
-If the `log` function wasn't injected into the context object, a warning is
+If no `log` function was injected into the context object, a warning is
 printed and a `noop`-fallback is return instead.
 
 ```js
@@ -189,6 +188,10 @@ const server = createServer(
   lightpress(injectLogger(catchError(allowedMethods(["GET"], hello))))
 );
 ```
+
+Just like with error handlers, you have the exact same control when to extend
+the context object. This lets you for example inject a `user` right before your
+API handler is called, but ignore it for all sibling handlers.
 
 ## Environment Variables
 
