@@ -1,9 +1,7 @@
-jest.mock("./create-context");
 jest.mock("./send-result");
 jest.mock("./send-error");
 
 const { lightpress } = require("./lightpress");
-const { createContext } = require("./create-context");
 const { sendError } = require("./send-error");
 const { sendResult } = require("./send-result");
 
@@ -18,36 +16,25 @@ describe("lightpress", () => {
     expect(typeof lightpress(() => void 0)).toBe("function");
   });
 
-  it("calls given handler", async () => {
+  it("calls handler with default context", async () => {
     const requestFixture = {};
     const responseFixture = {};
-    const contextFixture = {};
     const handlerMock = jest.fn();
-
-    createContext.mockImplementation(() => contextFixture);
 
     await lightpress(handlerMock)(requestFixture, responseFixture);
 
     expect(handlerMock).toHaveBeenCalledTimes(1);
-    expect(handlerMock).toHaveBeenCalledWith(contextFixture);
+    expect(handlerMock).toHaveBeenCalledWith({ request: requestFixture });
   });
 
-  it("calls `createContext`", async () => {
+  it("calls handler with context from `createContext` function", async () => {
     const requestFixture = {};
     const responseFixture = {};
+    const contextFixture = {};
+    const createContextMock = jest.fn(() => contextFixture);
+    const handlerMock = jest.fn();
 
-    await lightpress(() => null)(requestFixture, responseFixture);
-
-    expect(createContext).toHaveBeenCalledTimes(1);
-    expect(createContext).toHaveBeenCalledWith(requestFixture, responseFixture);
-  });
-
-  it("calls `createContext` defined via options", async () => {
-    const requestFixture = {};
-    const responseFixture = {};
-    const createContextMock = jest.fn();
-
-    await lightpress(() => null, { createContext: createContextMock })(
+    await lightpress(handlerMock, { createContext: createContextMock })(
       requestFixture,
       responseFixture
     );
@@ -57,6 +44,7 @@ describe("lightpress", () => {
       requestFixture,
       responseFixture
     );
+    expect(handlerMock).toHaveBeenCalledWith(contextFixture);
   });
 
   it("calls `sendResult`", async () => {
@@ -73,11 +61,28 @@ describe("lightpress", () => {
   it("calls `sendError`", async () => {
     const requestFixture = {};
     const responseFixture = {};
-    const errorFixture = { toResult: jest.fn() };
+    const errorFixture = {};
 
     await lightpress(() => {
       throw errorFixture;
     })(requestFixture, responseFixture);
+
+    expect(sendError).toHaveBeenCalledTimes(1);
+    expect(sendError).toHaveBeenCalledWith(responseFixture, errorFixture);
+  });
+
+  it("calls `sendError` on `createContext` error", async () => {
+    const requestFixture = {};
+    const responseFixture = {};
+    const errorFixture = {};
+    const createContextMock = jest.fn(() => {
+      throw errorFixture;
+    });
+
+    await lightpress(() => null, { createContext: createContextMock })(
+      requestFixture,
+      responseFixture
+    );
 
     expect(sendError).toHaveBeenCalledTimes(1);
     expect(sendError).toHaveBeenCalledWith(responseFixture, errorFixture);

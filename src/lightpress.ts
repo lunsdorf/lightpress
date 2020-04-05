@@ -1,7 +1,6 @@
 import { IncomingMessage, ServerResponse } from "http";
 import { LightpressHandler } from "./types/lightpress-handler";
 import { LightpressContext } from "./types/lightpress-context";
-import { createContext as defaultCreateContext } from "./create-context";
 import { sendError } from "./send-error";
 import { sendResult } from "./send-result";
 
@@ -20,13 +19,24 @@ export function lightpress<T extends LightpressContext = LightpressContext>(
     throw new TypeError("handler must be a function");
   }
 
-  const createContext = options.createContext || defaultCreateContext;
+  const { createContext } = options;
 
   return (request: IncomingMessage, response: ServerResponse) => {
     // Directly return the promise so that it's resolution can be tracked
     // outside, e.g. in unit tests.
-    return Promise.resolve(createContext(request, response))
-      .then((context) => handler(context as T)) // FIXME: infer type
+    return new Promise<T>((resolve, reject) => {
+      if (createContext) {
+        try {
+          resolve(createContext(request, response));
+        } catch (error) {
+          reject(error);
+        }
+      } else {
+        // TODO: investigate if type can be inferred (function overloading?)
+        resolve({ request } as T);
+      }
+    })
+      .then((context) => handler(context))
       .then((result) => sendResult(response, result))
       .catch((error) => sendError(response, error));
   };
