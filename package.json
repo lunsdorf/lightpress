@@ -40,15 +40,15 @@
     "url": "https://github.com/lunsdorf/lightpress/issues"
   },
   "devDependencies": {
-    "@rollup/plugin-sucrase": "3.0.0",
+    "@rollup/plugin-sucrase": "3.1.0",
     "@sucrase/jest-plugin": "2.0.0",
-    "@types/jest": "25.1.5",
-    "@types/node": "13.11.0",
-    "jest": "25.2.7",
-    "prettier": "2.0.2",
+    "@types/jest": "26.0.4",
+    "@types/node": "14.0.22",
+    "jest": "26.1.0",
+    "prettier": "2.0.5",
     "rimraf": "3.0.2",
-    "rollup": "2.3.2",
+    "rollup": "2.21.0",
     "rollup-plugin-import-resolver": "1.0.4",
-    "typescript": "3.8.3"
+    "typescript": "3.9.6"
   }
 }
