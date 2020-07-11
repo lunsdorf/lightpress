@@ -7,7 +7,7 @@ import { sendResult } from "./send-result";
 export function lightpress(
   handler: LightpressHandler<LightpressContext>
 ): (request: IncomingMessage, response: ServerResponse) => Promise<void> {
-  if ("function" !== typeof handler) {
+  if (typeof handler !== "function") {
     throw new TypeError("request handler must be a function");
   }
 

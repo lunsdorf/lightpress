@@ -1,7 +1,8 @@
 import { STATUS_CODES } from "http";
+import { LightpressError } from "./types/lightpress-error";
 import { LightpressResult } from "./types/lightpress-result";
 
-export class HttpError extends Error {
+export class HttpError extends Error implements LightpressError {
   public readonly name: string = "HttpError";
   public readonly statusCode: number;
 
