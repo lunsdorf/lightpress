@@ -6,7 +6,7 @@ const { sendError } = require("./send-error");
 const { sendResult } = require("./send-result");
 
 describe("lightpress", () => {
-  beforeEach(() => jest.resetAllMocks());
+  afterEach(() => jest.resetAllMocks());
 
   it("throws an error if no handler was given", () => {
     expect(() => lightpress()).toThrowError();

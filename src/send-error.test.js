@@ -5,7 +5,7 @@ const { sendResult } = require("./send-result");
 const { HttpError } = require("./http-error");
 
 describe("sendError", () => {
-  beforeEach(() => jest.resetAllMocks());
+  afterEach(() => jest.resetAllMocks());
 
   it("calles `sendResult`", () => {
     const responseFixture = {};

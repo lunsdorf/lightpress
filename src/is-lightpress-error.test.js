@@ -1,7 +1,7 @@
 const { isLightpressError } = require("./is-lightpress-error");
 
 describe("isLightpressError", () => {
-  beforeEach(() => jest.resetAllMocks());
+  afterEach(() => jest.resetAllMocks());
 
   it("returns `true` when a `toResult` function is defined", () => {
     expect(isLightpressError()).toBe(false);

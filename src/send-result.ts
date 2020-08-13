@@ -1,6 +1,6 @@
 import { ServerResponse } from "http";
-import { Readable } from "stream";
 import { LightpressResult } from "./types/lightpress-result";
+import { isReadableStream } from "./is-readable-stream";
 
 export function sendResult(
   response: ServerResponse,
@@ -16,7 +16,7 @@ export function sendResult(
     response.statusCode = statusCode;
   }
 
-  if (body instanceof Readable) {
+  if (isReadableStream(body)) {
     body.pipe(response);
   } else {
     response.end(body);

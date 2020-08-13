@@ -1,5 +1,3 @@
-jest.mock("stream");
-
 const { Readable } = require("stream");
 const { sendResult } = require("./send-result");
 
@@ -10,7 +8,7 @@ describe("sendResult", () => {
     end: jest.fn(),
   };
 
-  beforeEach(() => {
+  afterEach(() => {
     response.statusCode = void 0;
     jest.resetAllMocks();
   });
@@ -82,6 +80,8 @@ describe("sendResult", () => {
 
   it("sends body stream", () => {
     const bodyFixture = new Readable();
+
+    bodyFixture.pipe = jest.fn();
 
     sendResult(response, { body: bodyFixture });
 
