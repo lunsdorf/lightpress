@@ -1,4 +1,4 @@
-import { LightpressRecoverer } from "./types/lightpress-recoverer";
+import { LightpressRecoveryHandler } from "./types/lightpress-recovery-handler";
 import { isLightpressError } from "./is-lightpress-error";
 
 /**
@@ -7,8 +7,8 @@ import { isLightpressError } from "./is-lightpress-error";
  * **WARNING:** does not catch errors from the recover function itself!
  */
 export function recoverError(
-  recover: LightpressRecoverer
-): LightpressRecoverer {
+  recover: LightpressRecoveryHandler
+): LightpressRecoveryHandler {
   return (error) => {
     if (isLightpressError(error)) {
       try {

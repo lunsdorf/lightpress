@@ -1,14 +1,14 @@
 import { IncomingMessage, ServerResponse } from "http";
 import { LightpressContext } from "./types/lightpress-context";
 import { LightpressHandler } from "./types/lightpress-handler";
-import { LightpressRecoverer } from "./types/lightpress-recoverer";
+import { LightpressRecoveryHandler } from "./types/lightpress-recovery-handler";
 import { LightpressResult } from "./types/lightpress-result";
 import { recoverError } from "./recover-error";
 import { sendResult } from "./send-result";
 
 export function lightpress(
   handler: LightpressHandler<LightpressContext>,
-  recover?: LightpressRecoverer
+  recover?: LightpressRecoveryHandler
 ): (request: IncomingMessage, response: ServerResponse) => Promise<void> {
   if (typeof handler !== "function") {
     throw new TypeError("request handler must be a function");
@@ -32,6 +32,7 @@ export function lightpress(
           console.error(error);
 
           try {
+            // TODO: investigate if closing the connection is a better option
             request.pause();
             response.end();
           } catch (exception) {

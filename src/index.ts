@@ -2,7 +2,7 @@
 export * from "./types/lightpress-context";
 export * from "./types/lightpress-error";
 export * from "./types/lightpress-handler";
-export * from "./types/lightpress-recoverer";
+export * from "./types/lightpress-recovery-handler";
 export * from "./types/lightpress-result";
 
 // implementation
