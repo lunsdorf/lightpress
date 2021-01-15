@@ -11,7 +11,7 @@
   "scripts": {
     "build": "rimraf $npm_package_directories_lib && rollup -c",
     "develop": "rollup -c -w",
-    "format": "prettier --write .",
+    "format": "prettier --ignore-path .gitignore --write .",
     "prepublishOnly": "npm run test && npm run build && npm run types",
     "test": "jest",
     "types": "tsc --emitDeclarationOnly"
