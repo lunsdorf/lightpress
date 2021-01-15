@@ -7,6 +7,6 @@ import { LightpressResult } from "./lightpress-result";
  * would make dataflow overly complicated and can already be archieved through
  * the use of promises itself.
  */
-export interface LightpressError {
+export interface LightpressError extends Error {
   toResult(): LightpressResult;
 }
