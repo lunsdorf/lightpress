@@ -1,5 +1,5 @@
 import { LightpressResult } from "./lightpress-result";
 
-export type LightpressRecoverer = (
+export type LightpressRecoveryHandler = (
   error: Error
 ) => LightpressResult | Promise<LightpressResult>;
