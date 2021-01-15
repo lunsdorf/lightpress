@@ -1,5 +1,5 @@
 const { isReadableStream } = require("./is-readable-stream");
-const { Readable, Duplex, PassThrough } = require("stream");
+const { Duplex, PassThrough, Readable, Writable } = require("stream");
 
 describe("isReadableStream", () => {
   it("returns `true` when a readable stream was given", () => {
@@ -10,8 +10,9 @@ describe("isReadableStream", () => {
     expect(isReadableStream(1)).toBe(false);
     expect(isReadableStream({})).toBe(false);
     expect(isReadableStream([])).toBe(false);
+    expect(isReadableStream(new Writable())).toBe(false);
     expect(isReadableStream(new Duplex())).toBe(true);
-    expect(isReadableStream(new Readable())).toBe(true);
     expect(isReadableStream(new PassThrough())).toBe(true);
+    expect(isReadableStream(new Readable())).toBe(true);
   });
 });

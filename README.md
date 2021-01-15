@@ -194,12 +194,3 @@ const server = createServer(
 Just like with error handlers, you have the exact same control when to extend
 the context object. This lets you for example inject a `user` right before your
 API handler is called, but ignore it for all sibling handlers.
-
-## Environment Variables
-
-Lightpress reacts to certain environment variables that can be used to control
-the internal behaviour.
-
-| Variable Name      | Variable Value | Description                                 |
-| :----------------- | :------------- | :------------------------------------------ |
-| `LIGHTPRESS_ERROR` | `verbose`      | Writes unhandled errors to `console.error`. |
