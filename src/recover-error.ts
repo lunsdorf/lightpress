@@ -3,7 +3,8 @@ import { isLightpressError } from "./is-lightpress-error";
 
 /**
  * Wraps a recover function to automatically recover from `LightpressError`s by
- * calling `toResult()` on it.
+ * calling `toResult()` on it. All other errors are passed on to the given
+ * recover function.
  * **WARNING:** does not catch errors from the recover function itself!
  */
 export function recoverError(
