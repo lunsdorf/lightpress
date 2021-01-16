@@ -2,6 +2,7 @@ import { STATUS_CODES } from "http";
 import { LightpressError } from "./types/lightpress-error";
 import { LightpressResult } from "./types/lightpress-result";
 
+/** Basic error implementation to signal HTTP errors. */
 export class HttpError extends Error implements LightpressError {
   public readonly name: string = "HttpError";
   public readonly statusCode: number;
