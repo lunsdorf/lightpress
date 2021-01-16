@@ -7,18 +7,18 @@ import { isLightpressError } from "./is-lightpress-error";
  * recover function.
  * **WARNING:** does not catch errors from the recover function itself!
  */
-export function recoverError(
-  recover: LightpressRecoveryHandler
+export function fromLightpressError(
+  recoverUnhandled: LightpressRecoveryHandler
 ): LightpressRecoveryHandler {
   return (request, error) => {
     if (isLightpressError(error)) {
       try {
         return error.toResult();
       } catch (exception) {
-        return recover(request, exception);
+        return recoverUnhandled(request, exception);
       }
     } else {
-      return recover(request, error);
+      return recoverUnhandled(request, error);
     }
   };
 }

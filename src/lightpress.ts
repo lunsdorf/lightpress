@@ -3,7 +3,7 @@ import { LightpressContext } from "./types/lightpress-context";
 import { LightpressHandler } from "./types/lightpress-handler";
 import { LightpressRecoveryHandler } from "./types/lightpress-recovery-handler";
 import { LightpressResult } from "./types/lightpress-result";
-import { recoverError } from "./recover-error";
+import { fromLightpressError } from "./from-lightpress-error";
 import { sendResult } from "./send-result";
 
 /**
@@ -22,9 +22,10 @@ export function lightpress(
   }
 
   // Although it requires a little bit more boilerplate code, it is expected
-  // that the given recover handler cares about `LightpressError`s itself. This
-  // provides more control over the error recovery.
-  const innerRecover = recover || recoverError(() => ({ statusCode: 500 }));
+  // that the given recover handler cares about `LightpressError`s itself. In
+  // total, this provides more control over the error recovery.
+  const innerRecover =
+    recover || fromLightpressError(() => ({ statusCode: 500 }));
 
   return (request: IncomingMessage, response: ServerResponse) =>
     // Directly return the promise so that it's resolution can be tracked
