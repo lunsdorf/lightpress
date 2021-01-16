@@ -9,20 +9,22 @@ describe("recoverError", () => {
 
   it("calls given recovery function", async () => {
     const recoverMock = jest.fn();
+    const requestFixture = {};
     const errorFixture = {};
 
-    recoverError(recoverMock)(errorFixture);
+    recoverError(recoverMock)(requestFixture, errorFixture);
 
     expect(recoverMock).toHaveBeenCalledTimes(1);
-    expect(recoverMock).toHaveBeenCalledWith(errorFixture);
+    expect(recoverMock).toHaveBeenCalledWith(requestFixture, errorFixture);
   });
 
   it("calls `error.toResult()` if available", async () => {
     const recoverMock = jest.fn();
     const toResultMock = jest.fn();
+    const requestFixture = {};
     const errorFixture = { toResult: toResultMock };
 
-    recoverError(recoverMock)(errorFixture);
+    recoverError(recoverMock)(requestFixture, errorFixture);
 
     expect(recoverMock).toHaveBeenCalledTimes(0);
     expect(toResultMock).toHaveBeenCalledTimes(1);
@@ -30,6 +32,7 @@ describe("recoverError", () => {
 
   it("calls recovery functon if `error.toResult()` throws", async () => {
     const recoverMock = jest.fn();
+    const requestFixture = {};
     const exceptionFixture = {};
     const errorFixture = {
       toResult() {
@@ -37,9 +40,9 @@ describe("recoverError", () => {
       },
     };
 
-    recoverError(recoverMock)(errorFixture);
+    recoverError(recoverMock)(requestFixture, errorFixture);
 
     expect(recoverMock).toHaveBeenCalledTimes(1);
-    expect(recoverMock).toHaveBeenCalledWith(exceptionFixture);
+    expect(recoverMock).toHaveBeenCalledWith(requestFixture, exceptionFixture);
   });
 });

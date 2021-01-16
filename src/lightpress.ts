@@ -19,26 +19,27 @@ export function lightpress(
 
   const innerRecover = recover || recoverError(() => ({ statusCode: 500 }));
 
-  return (request: IncomingMessage, response: ServerResponse) => {
+  return (request: IncomingMessage, response: ServerResponse) =>
     // Directly return the promise so that it's resolution can be tracked
     // outside, e.g. in unit tests.
-    return (
-      new Promise<LightpressResult>((resolve) => resolve(handler({ request })))
-        .catch(innerRecover)
-        .then((result) => sendResult(response, result))
-        // Fallback guard to prevent the application to crash if error recovery
-        // or sending the response have failed.
-        .catch((error) => {
-          console.error(error);
+    new Promise<LightpressResult>((resolve) => resolve(handler({ request })))
+      // Instead of the context object, the request is passed to the recovery
+      // handler as we cannot know if the reference to the context has changed
+      // during handler invokation. This would assumably lead to more
+      // confussion about possibly missing properties than it would help.
+      .catch((error) => innerRecover(request, error))
+      .then((result) => sendResult(response, result))
+      // Fallback guard to prevent the application to crash if error recovery
+      // or sending the response have failed.
+      .catch((error) => {
+        console.error(error);
 
-          try {
-            // TODO: investigate if closing the connection is a better option
-            request.pause();
-            response.end();
-          } catch (exception) {
-            console.error(exception);
-          }
-        })
-    );
-  };
+        try {
+          // TODO: investigate if closing the connection is a better option
+          request.pause();
+          response.end();
+        } catch (exception) {
+          console.error(exception);
+        }
+      });
 }

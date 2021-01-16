@@ -6,8 +6,12 @@ const { sendResult } = require("./send-result");
 describe("lightpress", () => {
   afterEach(() => jest.resetAllMocks());
 
-  it("throws an error if no handler was given", () => {
+  it("throws if no handler was given", () => {
     expect(() => lightpress()).toThrowError();
+  });
+
+  it("throws if given error recovery handler is not a function", () => {
+    expect(() => lightpress(() => void 0, "Not A Function")).toThrowError();
   });
 
   it("returns a function", () => {
@@ -36,7 +40,7 @@ describe("lightpress", () => {
     expect(sendResult).toHaveBeenCalledWith(responseFixture, resultFixture);
   });
 
-  it("calls `sendError`", async () => {
+  it("calls error recovery handler", async () => {
     const requestFixture = {};
     const responseFixture = {};
     const errorFixture = {};
@@ -48,7 +52,7 @@ describe("lightpress", () => {
     }, recoverMock)(requestFixture, responseFixture);
 
     expect(recoverMock).toHaveBeenCalledTimes(1);
-    expect(recoverMock).toHaveBeenCalledWith(errorFixture);
+    expect(recoverMock).toHaveBeenCalledWith(requestFixture, errorFixture);
     expect(sendResult).toHaveBeenCalledTimes(1);
     expect(sendResult).toHaveBeenCalledWith(
       responseFixture,
@@ -56,7 +60,7 @@ describe("lightpress", () => {
     );
   });
 
-  it("supports async result", async () => {
+  it("supports async results", async () => {
     const requestFixture = {};
     const responseFixture = {};
     const resultFixture = {};
@@ -70,7 +74,7 @@ describe("lightpress", () => {
     expect(sendResult).toHaveBeenCalledWith(responseFixture, resultFixture);
   });
 
-  it("supports async error", async () => {
+  it("supports async errors", async () => {
     const requestFixture = {};
     const responseFixture = {};
     const errorFixture = {};
@@ -83,7 +87,7 @@ describe("lightpress", () => {
     );
 
     expect(recoverMock).toHaveBeenCalledTimes(1);
-    expect(recoverMock).toHaveBeenCalledWith(errorFixture);
+    expect(recoverMock).toHaveBeenCalledWith(requestFixture, errorFixture);
     expect(sendResult).toHaveBeenCalledTimes(1);
     expect(sendResult).toHaveBeenCalledWith(
       responseFixture,

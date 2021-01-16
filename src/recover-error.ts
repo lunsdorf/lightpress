@@ -9,15 +9,15 @@ import { isLightpressError } from "./is-lightpress-error";
 export function recoverError(
   recover: LightpressRecoveryHandler
 ): LightpressRecoveryHandler {
-  return (error) => {
+  return (request, error) => {
     if (isLightpressError(error)) {
       try {
         return error.toResult();
       } catch (exception) {
-        return recover(exception);
+        return recover(request, exception);
       }
     } else {
-      return recover(error);
+      return recover(request, error);
     }
   };
 }
