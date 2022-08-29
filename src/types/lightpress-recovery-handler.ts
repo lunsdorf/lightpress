@@ -4,5 +4,5 @@ import { LightpressResult } from "./lightpress-result";
 /** Describes a function to convert an error to a `LightpressResult`. */
 export type LightpressRecoveryHandler = (
   request: IncomingMessage,
-  error: Error
+  error: unknown
 ) => LightpressResult | Promise<LightpressResult>;
