@@ -1,4 +1,4 @@
-const { Readable } = require("stream");
+const { Readable } = require("node:stream");
 const { sendResult } = require("./send-result");
 
 describe("sendResult", () => {
@@ -53,7 +53,7 @@ describe("sendResult", () => {
     expect(response.statusCode).toBeUndefined();
     expect(response.writeHead).toHaveBeenCalledWith(
       statusCodeFixture,
-      headersFixture
+      headersFixture,
     );
     expect(response.end).toHaveBeenCalledWith(null);
   });

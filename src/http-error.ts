@@ -1,28 +1,32 @@
-import { STATUS_CODES } from "http";
-import { LightpressError } from "./types/lightpress-error";
-import { LightpressResult } from "./types/lightpress-result";
+import type { OutgoingHttpHeaders } from "node:http";
+import type { HttpResult } from "./create-request-listener";
+import { STATUS_CODES } from "node:http";
 
-/** Basic error implementation to signal HTTP errors. */
-export class HttpError extends Error implements LightpressError {
-  public readonly name: string = "HttpError";
-  public readonly statusCode: number;
+/** An error that can be send as an HTTP result. */
+export class HttpError extends Error {
+  name: string = "HttpError";
 
-  /**
-   * The HTTP error represents an error based on the HTTP error codes.
-   * @param statusCode An HTTP status code
-   */
-  public constructor(statusCode: number) {
-    super(STATUS_CODES[statusCode]);
+  statusCode: number;
+  body?: null | string | Buffer | NodeJS.ReadableStream;
+  headers?: null | OutgoingHttpHeaders;
 
+  constructor(result: HttpResult, options?: ErrorOptions);
+  constructor(statusCode: number, options?: ErrorOptions);
+  constructor(resultOrStatusCode: number | HttpResult, options?: ErrorOptions) {
+    const [statusCode, result] =
+      typeof resultOrStatusCode === "number"
+        ? [resultOrStatusCode, null]
+        : [resultOrStatusCode?.statusCode ?? 500, resultOrStatusCode];
+
+    super(STATUS_CODES[statusCode], options);
+
+    // TODO: investigate if this is really needed
     if (Error.captureStackTrace) {
       Error.captureStackTrace(this, this.constructor);
     }
 
     this.statusCode = statusCode;
-  }
-
-  /** Converts the error to an HTTP result object. */
-  public toResult(): LightpressResult {
-    return { statusCode: this.statusCode };
+    this.body = result?.body;
+    this.headers = result?.headers;
   }
 }

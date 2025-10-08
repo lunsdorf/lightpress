@@ -1,15 +1,15 @@
 {
   "name": "lightpress",
-  "version": "1.1.0",
+  "version": "2.0.0",
   "description": "Your composable HTTP server.",
-  "main": "lib/index.js",
-  "module": "lib/index.mjs",
+  "type": "module",
   "typings": "lib/index.d.ts",
+  "main": "lib/index.js",
   "engines": {
-    "node": ">=12.0.0"
+    "node": ">=20.0.0"
   },
   "scripts": {
-    "build": "rimraf $npm_package_directories_lib && rollup -c",
+    "build": "rimraf ./lib && tsc",
     "develop": "rollup -c -w",
     "format": "prettier --ignore-path .gitignore --write .",
     "prepublishOnly": "npm run test && npm run build && npm run types",
@@ -19,9 +19,6 @@
   "files": [
     "lib/**/*"
   ],
-  "directories": {
-    "lib": "lib"
-  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/lunsdorf/lightpress.git"
@@ -40,15 +37,13 @@
     "url": "https://github.com/lunsdorf/lightpress/issues"
   },
   "devDependencies": {
-    "@rollup/plugin-sucrase": "4.0.4",
-    "@sucrase/jest-plugin": "2.2.1",
-    "@types/jest": "28.1.8",
-    "@types/node": "18.7.13",
-    "jest": "29.0.1",
-    "prettier": "2.7.1",
-    "rimraf": "3.0.2",
-    "rollup": "2.78.1",
-    "rollup-plugin-import-resolver": "1.2.1",
-    "typescript": "4.8.2"
+    "@swc/core": "^1.7.40",
+    "@swc/jest": "^0.2.37",
+    "@types/jest": "^29.5.14",
+    "@types/node": "^20.14.8",
+    "jest": "^29.7.0",
+    "prettier": "^3.3.3",
+    "rimraf": "^6.0.1",
+    "typescript": "^5.6.3"
   }
 }

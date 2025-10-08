@@ -1,25 +1,20 @@
-import { ServerResponse } from "http";
-import { LightpressResult } from "./types/lightpress-result";
+import type { ServerResponse } from "node:http";
+import type { HttpResult } from "./create-request-listener";
 import { isReadableStream } from "./is-readable-stream";
 
-/** Takes a `LightpressResult` and sends it as HTTP response. */
-export function sendResult(
-  response: ServerResponse,
-  result: LightpressResult
-): void {
-  const statusCode = result && result.statusCode ? result.statusCode : 200;
-  const headers = result && result.headers ? result.headers : null;
-  const body = result && result.body ? result.body : null;
+/** Passes the given {@link HttpResult} to the given {@link ServerResponse}. */
+export function sendResult(response: ServerResponse, result: HttpResult): void {
+  const statusCode = result?.statusCode ?? 200;
 
-  if (headers) {
-    response.writeHead(statusCode, headers);
+  if (result?.headers) {
+    response.writeHead(statusCode, result.headers);
   } else {
     response.statusCode = statusCode;
   }
 
-  if (isReadableStream(body)) {
-    body.pipe(response);
+  if (isReadableStream(result?.body)) {
+    result.body.pipe(response);
   } else {
-    response.end(body);
+    response.end(result?.body ?? null);
   }
 }

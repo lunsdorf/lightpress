@@ -1,17 +1,42 @@
+// {
+//   "compilerOptions": {
+//     "allowSyntheticDefaultImports": true,
+//     "declaration": true,
+//     "esModuleInterop": true,
+//     "module": "commonjs",
+//     "noFallthroughCasesInSwitch": true,
+//     "noImplicitReturns": true,
+//     "noUnusedLocals": true,
+//     "noUnusedParameters": true,
+//     "outDir": "./lib",
+//     "strict": true,
+//     "target": "esnext",
+//     "types": ["node"]
+//   },
+//   "exclude": ["node_modules/", "lib/", "tmp/"]
+// }
+
 {
   "compilerOptions": {
+    "allowJs": false,
     "allowSyntheticDefaultImports": true,
+    "checkJs": false,
     "declaration": true,
+    // "declarationMap": true,
     "esModuleInterop": true,
-    "module": "commonjs",
+    "forceConsistentCasingInFileNames": true,
     "noFallthroughCasesInSwitch": true,
     "noImplicitReturns": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "outDir": "./lib",
+    "skipLibCheck": true,
     "strict": true,
-    "target": "esnext",
-    "types": ["node"]
+
+    "lib": ["ES2022"],
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": null,
+    "outDir": "./lib"
   },
-  "exclude": ["node_modules/", "lib/", "tmp/"]
+  "files": ["./src/index.ts"]
 }

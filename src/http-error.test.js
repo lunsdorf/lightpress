@@ -1,4 +1,4 @@
-const { STATUS_CODES } = require("http");
+const { STATUS_CODES } = require("node:http");
 const { HttpError } = require("./http-error");
 
 describe("HttpError", () => {
@@ -6,23 +6,49 @@ describe("HttpError", () => {
     expect(new HttpError(400)).toBeInstanceOf(Error);
   });
 
-  it("has the correct statusCode", () => {
-    expect(new HttpError(400).statusCode).toBe(400);
+  it("supports `cause`", () => {
+    const causeFixture = new Error("my fault");
+
+    expect(new HttpError(400, { cause: causeFixture }).cause).toBe(
+      causeFixture,
+    );
   });
 
   it("defaults to standard HTTP message", () => {
     expect(new HttpError(400).message).toBe(STATUS_CODES[400]);
   });
 
-  it("is serializable to HTTP result", () => {
-    expect(typeof new HttpError(400).toResult).toBe("function");
+  it("supports construction from HTTP status code", () => {
+    const statusCodeFixture = 400;
+
+    const subject = new HttpError(statusCodeFixture);
+
+    expect(subject.statusCode).toBe(statusCodeFixture);
+    expect(subject.body).toBeUndefined();
+    expect(subject.headers).toBeUndefined();
   });
 
-  it("serializes to the expected HTTP result object", () => {
-    const codeFixture = 400;
+  it("supports construction from HttpResult", () => {
+    const statusCodeFixture = 400;
+    const bodyFixture = "__http_result_body__";
+    const headersFixture = {};
 
-    expect(new HttpError(codeFixture).toResult()).toEqual({
-      statusCode: codeFixture,
+    const subject = new HttpError({
+      statusCode: statusCodeFixture,
+      headers: headersFixture,
+      body: bodyFixture,
     });
+
+    expect(subject.statusCode).toBe(statusCodeFixture);
+    expect(subject.body).toBe(bodyFixture);
+    expect(subject.headers).toBe(headersFixture);
+  });
+
+  it("supports construction from empty HttpResult", () => {
+    const subject = new HttpError();
+
+    expect(subject.statusCode).toBe(500);
+    expect(subject.body).toBeUndefined();
+    expect(subject.headers).toBeUndefined();
   });
 });

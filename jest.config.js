@@ -4,6 +4,6 @@ module.exports = {
   testEnvironment: "node",
   testMatch: ["**/*.test.js"],
   transform: {
-    "^.+\\.(js|ts)$": "@sucrase/jest-plugin",
+    "^.+\\.(js|ts)$": "@swc/jest",
   },
 };

@@ -1,52 +1,37 @@
 # lightpress
 
-Lightpress is a thin wrapper around node's HTTP handler interface, that enables
-you to
-
-- compose a handler tree without overhead
-- write reusable and easy-to-test handler functions
-
-Although you can use lightpress for any kind of application, it was designed
-with modern API driven web applications in mind. These usually require a single
-handler for serving the (SSR) HTML content, another one for static assets, and
-one or more handlers for data.
+Lightpress is a thin wrapper around node's HTTP request event and provides a
+composable HTTP handler interface.
 
 ## Installation
 
-You can install lightpress from [npmjs.com](https://www.npmjs.com) using your
-favorite package manager, e.g.
+You can install lightpress from [npmjs.com](https://www.npmjs.com/package/lightpress)
+using your favorite package manager, e.g.
 
 ```bash
-$ npm install --save lightpress
+$ npm add lightpress
 ```
 
 ## Getting Started
 
-In lightpress a request handler is a plain function that takes a context object
-as single argument and returns a result or a promise that resolves to a result.
+In lightpress, an HTTP handler is a simple function that receives an HTTP
+request and returns a result.
 
-By default, the context object only contains a reference to the incoming
-request, but can be augmented to your application's needs.
-
-The handler's outcome, if any, has to be an object that might contain a
-`statusCode`, `headers` and a `body`.
-
-```js
+```ts
 import { createServer } from "http";
-import lightpress from "lightpress";
+import createRequestListener from "lightpress";
 
-function hello(context) {
+function greet(request) {
   return {
     statusCode: 200,
     headers: {
       "Content-Type": "text/plain",
     },
-    body: `Hello from '${context.request.url}'.`,
+    body: `Hello from '${request.url}'.`,
   };
 }
 
-const server = createServer(lightpress(hello));
-server.listen(8080);
+createServer(createRequestListener(greet)).listen(8080);
 ```
 
 ## Composing Handlers
@@ -116,7 +101,7 @@ function catchError(handler) {
 // ...
 
 const server = createServer(
-  lightpress(catchError(allowedMethods(["GET"], hello)))
+  lightpress(catchError(allowedMethods(["GET"], hello))),
 );
 ```
 
@@ -187,7 +172,7 @@ function hello(context) {
 // ...
 
 const server = createServer(
-  lightpress(injectLogger(catchError(allowedMethods(["GET"], hello))))
+  lightpress(injectLogger(catchError(allowedMethods(["GET"], hello)))),
 );
 ```
 
