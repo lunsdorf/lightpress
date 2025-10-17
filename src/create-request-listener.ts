@@ -7,16 +7,19 @@ import { sendResult } from "./send-result";
 import { HttpError } from "./http-error";
 
 /** An object that is used to be send as HTTP response. */
-export type HttpResult = void | null | {
-  /** Optional response status code (defaults to `200`). */
-  statusCode?: null | number;
+export type HttpResult =
+  | null
+  | undefined
+  | {
+      /** Optional response status code (defaults to `200`). */
+      statusCode?: null | number;
 
-  /** Optional response body. */
-  body?: null | string | Buffer | NodeJS.ReadableStream;
+      /** Optional response body. */
+      body?: null | string | Buffer | NodeJS.ReadableStream;
 
-  /** Optional HTTP response headers. */
-  headers?: null | OutgoingHttpHeaders;
-};
+      /** Optional HTTP response headers. */
+      headers?: null | OutgoingHttpHeaders;
+    };
 
 /** An HTTP request handler that creates an {@link HttpResult}. */
 export type HttpHandler<T extends object> = (
@@ -38,6 +41,9 @@ export function createRequestListener(
     try {
       result = await handler(request, {});
     } catch (error) {
+      request.pause();
+      response.end();
+
       // Instances of HttpError are send as response, all other error types are
       // considered unhandled and be re-thrown.
       if (error instanceof HttpError) {

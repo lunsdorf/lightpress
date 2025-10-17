@@ -1,14 +1,17 @@
 jest.mock("./send-result");
 
-const { createRequestListener } = require("./create-request-listener");
-const { HttpError } = require("./http-error");
-const { sendResult } = require("./send-result");
+import { createRequestListener } from "./create-request-listener";
+import { HttpError } from "./http-error";
+import { sendResult } from "./send-result";
 
 describe("createRequestListener()", () => {
+  const requestFixture = { pause: jest.fn() };
+  const responseFixture = { end: jest.fn() };
+
   afterEach(() => jest.resetAllMocks());
 
   it("throws if no handler was given", () => {
-    expect(() => createRequestListener()).toThrowError();
+    expect(() => createRequestListener()).toThrow();
   });
 
   it("returns a function", () => {
@@ -16,19 +19,19 @@ describe("createRequestListener()", () => {
   });
 
   it("calls handler", async () => {
-    const requestFixture = {};
-    const responseFixture = {};
+    const emptyContext = {};
     const handlerMock = jest.fn();
 
     await createRequestListener(handlerMock)(requestFixture, responseFixture);
 
     expect(handlerMock).toHaveBeenCalledTimes(1);
-    expect(handlerMock).toHaveBeenCalledWith(requestFixture);
+    expect(handlerMock).toHaveBeenCalledWith(
+      requestFixture,
+      expect.objectContaining(emptyContext),
+    );
   });
 
   it("calls `sendResult`", async () => {
-    const requestFixture = {};
-    const responseFixture = {};
     const resultFixture = {};
 
     await createRequestListener(() => resultFixture)(
@@ -41,8 +44,6 @@ describe("createRequestListener()", () => {
   });
 
   it("supports async results", async () => {
-    const requestFixture = {};
-    const responseFixture = {};
     const resultFixture = {};
 
     await createRequestListener(() => Promise.resolve(resultFixture))(
@@ -55,8 +56,6 @@ describe("createRequestListener()", () => {
   });
 
   it("sends `HttpError` as result", async () => {
-    const requestFixture = {};
-    const responseFixture = {};
     const errorFixture = new HttpError(400);
 
     await createRequestListener(() => {
@@ -68,8 +67,6 @@ describe("createRequestListener()", () => {
   });
 
   it("supports async `HttpError` as result", async () => {
-    const requestFixture = {};
-    const responseFixture = {};
     const errorFixture = new HttpError(400);
 
     await createRequestListener(() => Promise.reject(errorFixture))(
@@ -82,8 +79,6 @@ describe("createRequestListener()", () => {
   });
 
   it("throws for Non-`HttpError`'s", async () => {
-    const requestFixture = {};
-    const responseFixture = {};
     const errorFixture = new Error("Oh no!");
 
     const subject = createRequestListener(() => {
@@ -98,8 +93,6 @@ describe("createRequestListener()", () => {
   });
 
   it("throws for async  Non-`HttpError`'s", async () => {
-    const requestFixture = {};
-    const responseFixture = {};
     const errorFixture = new Error("Oh no!");
 
     const subject = createRequestListener(() => Promise.reject(errorFixture));
