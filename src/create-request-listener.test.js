@@ -5,102 +5,183 @@ import { HttpError } from "./http-error";
 import { sendResult } from "./send-result";
 
 describe("createRequestListener()", () => {
-  const requestFixture = { pause: jest.fn() };
-  const responseFixture = { end: jest.fn() };
+	let requestFixture = {};
+	let responseFixture = {};
 
-  afterEach(() => jest.resetAllMocks());
+	afterEach(() => {
+		requestFixture = {};
+		responseFixture = {};
 
-  it("throws if no handler was given", () => {
-    expect(() => createRequestListener()).toThrow();
-  });
+		jest.resetAllMocks();
+	});
 
-  it("returns a function", () => {
-    expect(typeof createRequestListener(() => void 0)).toBe("function");
-  });
+	it("throws if no handler was given", () => {
+		expect(() => createRequestListener()).toThrow();
+	});
 
-  it("calls handler", async () => {
-    const emptyContext = {};
-    const handlerMock = jest.fn();
+	it("returns a function", () => {
+		expect(typeof createRequestListener(() => void 0)).toBe("function");
+	});
 
-    await createRequestListener(handlerMock)(requestFixture, responseFixture);
+	it("calls handler", async () => {
+		const handlerMock = jest.fn();
 
-    expect(handlerMock).toHaveBeenCalledTimes(1);
-    expect(handlerMock).toHaveBeenCalledWith(
-      requestFixture,
-      expect.objectContaining(emptyContext),
-    );
-  });
+		await createRequestListener(handlerMock)(requestFixture, responseFixture);
 
-  it("calls `sendResult`", async () => {
-    const resultFixture = {};
+		expect(handlerMock).toHaveBeenCalledTimes(1);
+		expect(handlerMock).toHaveBeenCalledWith(requestFixture, undefined);
+	});
 
-    await createRequestListener(() => resultFixture)(
-      requestFixture,
-      responseFixture,
-    );
+	it("calls `sendResult`", async () => {
+		const resultFixture = {};
 
-    expect(sendResult).toHaveBeenCalledTimes(1);
-    expect(sendResult).toHaveBeenCalledWith(responseFixture, resultFixture);
-  });
+		await createRequestListener(() => resultFixture)(
+			requestFixture,
+			responseFixture,
+		);
 
-  it("supports async results", async () => {
-    const resultFixture = {};
+		expect(sendResult).toHaveBeenCalledTimes(1);
+		expect(sendResult).toHaveBeenCalledWith(responseFixture, resultFixture);
+	});
 
-    await createRequestListener(() => Promise.resolve(resultFixture))(
-      requestFixture,
-      responseFixture,
-    );
+	it("supports async results", async () => {
+		const resultFixture = {};
 
-    expect(sendResult).toHaveBeenCalledTimes(1);
-    expect(sendResult).toHaveBeenCalledWith(responseFixture, resultFixture);
-  });
+		await createRequestListener(() => Promise.resolve(resultFixture))(
+			requestFixture,
+			responseFixture,
+		);
 
-  it("sends `HttpError` as result", async () => {
-    const errorFixture = new HttpError(400);
+		expect(sendResult).toHaveBeenCalledTimes(1);
+		expect(sendResult).toHaveBeenCalledWith(responseFixture, resultFixture);
+	});
 
-    await createRequestListener(() => {
-      throw errorFixture;
-    })(requestFixture, responseFixture);
+	it("sends `HttpError` as result", async () => {
+		const errorFixture = new HttpError(400);
 
-    expect(sendResult).toHaveBeenCalledTimes(1);
-    expect(sendResult).toHaveBeenCalledWith(responseFixture, errorFixture);
-  });
+		await createRequestListener(() => {
+			throw errorFixture;
+		})(requestFixture, responseFixture);
 
-  it("supports async `HttpError` as result", async () => {
-    const errorFixture = new HttpError(400);
+		expect(sendResult).toHaveBeenCalledTimes(1);
+		expect(sendResult).toHaveBeenCalledWith(responseFixture, errorFixture);
+	});
 
-    await createRequestListener(() => Promise.reject(errorFixture))(
-      requestFixture,
-      responseFixture,
-    );
+	it("supports async `HttpError` as result", async () => {
+		const errorFixture = new HttpError(400);
 
-    expect(sendResult).toHaveBeenCalledTimes(1);
-    expect(sendResult).toHaveBeenCalledWith(responseFixture, errorFixture);
-  });
+		await createRequestListener(() => Promise.reject(errorFixture))(
+			requestFixture,
+			responseFixture,
+		);
 
-  it("throws for Non-`HttpError`'s", async () => {
-    const errorFixture = new Error("Oh no!");
+		expect(sendResult).toHaveBeenCalledTimes(1);
+		expect(sendResult).toHaveBeenCalledWith(responseFixture, errorFixture);
+	});
 
-    const subject = createRequestListener(() => {
-      throw errorFixture;
-    });
+	it("calls recover handler for unhandled errors", async () => {
+		const errorFixture = new Error("Oh no!");
+		const recoverFixture = {};
+		const recoverMock = jest.fn(() => recoverFixture);
 
-    await expect(subject(requestFixture, responseFixture)).rejects.toBe(
-      errorFixture,
-    );
+		await createRequestListener(() => {
+			throw errorFixture;
+		}, recoverMock)(requestFixture, responseFixture);
 
-    expect(sendResult).not.toHaveBeenCalled();
-  });
+		expect(recoverMock).toHaveBeenCalledWith(requestFixture, errorFixture);
+		expect(sendResult).toHaveBeenCalledWith(responseFixture, recoverFixture);
+	});
 
-  it("throws for async  Non-`HttpError`'s", async () => {
-    const errorFixture = new Error("Oh no!");
+	it("sends result from recovered unhandled error", async () => {
+		const errorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
+		const errorFixture = new Error("Oh no!");
+		const recoverFixture = { statusCode: 404 };
 
-    const subject = createRequestListener(() => Promise.reject(errorFixture));
+		await createRequestListener(
+			() => {
+				throw errorFixture;
+			},
+			() => recoverFixture,
+		)(requestFixture, responseFixture);
 
-    await expect(subject(requestFixture, responseFixture)).rejects.toBe(
-      errorFixture,
-    );
+		expect(errorSpy).not.toHaveBeenCalledWith(errorFixture);
+		expect(sendResult).toHaveBeenCalledWith(responseFixture, recoverFixture);
+	});
 
-    expect(sendResult).not.toHaveBeenCalled();
-  });
+	it("sends result from recovered unhandled async error", async () => {
+		const errorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
+		const errorFixture = new Error("Oh no!");
+		const recoverFixture = { statusCode: 404 };
+
+		await createRequestListener(
+			() => Promise.reject(errorFixture),
+			() => recoverFixture,
+		)(requestFixture, responseFixture);
+
+		expect(errorSpy).not.toHaveBeenCalledWith(errorFixture);
+		expect(sendResult).toHaveBeenCalledWith(responseFixture, recoverFixture);
+	});
+
+	it("sends status 500 if recover handler throws an error", async () => {
+		const errorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
+		const errorFixture = new Error("Oh no!");
+		const recoverErrorFixture = new Error("Not again!");
+
+		await createRequestListener(
+			() => Promise.reject(errorFixture),
+			() => {
+				throw recoverErrorFixture;
+			},
+		)(requestFixture, responseFixture);
+
+		expect(errorSpy).toHaveBeenCalledWith(recoverErrorFixture);
+		expect(sendResult).toHaveBeenCalledWith(responseFixture, {
+			statusCode: 500,
+		});
+	});
+
+	it("sends status 500 if recover handler throws an error async", async () => {
+		const errorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
+		const errorFixture = new Error("Oh no!");
+		const recoverErrorFixture = new Error("Not again!");
+
+		await createRequestListener(
+			() => Promise.reject(errorFixture),
+			() => Promise.reject(recoverErrorFixture),
+		)(requestFixture, responseFixture);
+
+		expect(errorSpy).toHaveBeenCalledWith(recoverErrorFixture);
+		expect(sendResult).toHaveBeenCalledWith(responseFixture, {
+			statusCode: 500,
+		});
+	});
+
+	it("sends status 500 for unhandled errors without recover handler", async () => {
+		const errorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
+		const errorFixture = new Error("Oh no!");
+
+		await createRequestListener(() => {
+			throw errorFixture;
+		})(requestFixture, responseFixture);
+
+		expect(errorSpy).toHaveBeenCalledWith(errorFixture);
+		expect(sendResult).toHaveBeenCalledWith(responseFixture, {
+			statusCode: 500,
+		});
+	});
+
+	it("sends status 500 for unhandled async errors without recover handler", async () => {
+		const errorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
+		const errorFixture = new Error("Oh no!");
+
+		await createRequestListener(() => Promise.reject(errorFixture))(
+			requestFixture,
+			responseFixture,
+		);
+
+		expect(errorSpy).toHaveBeenCalledWith(errorFixture);
+		expect(sendResult).toHaveBeenCalledWith(responseFixture, {
+			statusCode: 500,
+		});
+	});
 });

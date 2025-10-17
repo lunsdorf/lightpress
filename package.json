@@ -1,51 +1,51 @@
 {
-  "name": "lightpress",
-  "version": "2.0.0-alpha.1",
-  "description": "Your composable HTTP server.",
-  "type": "module",
-  "typings": "lib/index.d.ts",
-  "main": "lib/index.js",
-  "engines": {
-    "node": ">=22.0.0"
-  },
-  "scripts": {
-    "build": "rimraf ./lib && tsc",
-    "check-format": "biome check .",
-    "check-types": "tsc --noEmit",
-    "format": "biome check --write .",
-    "prepublishOnly": "npm run check-format && npm run test && npm run build",
-    "test": "jest"
-  },
-  "files": [
-    "lib/**/*"
-  ],
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/lunsdorf/lightpress.git"
-  },
-  "keywords": [
-    "composable",
-    "express",
-    "http",
-    "lightpress",
-    "server"
-  ],
-  "license": "MIT",
-  "author": "Sören Lünsdorf <code@lunsdorf.com>",
-  "homepage": "https://github.com/lunsdorf/lightpress#readme",
-  "bugs": {
-    "url": "https://github.com/lunsdorf/lightpress/issues"
-  },
-  "devDependencies": {
-    "@swc/core": "^1.13.5",
-    "@swc/jest": "^0.2.39",
-    "@types/jest": "^30.0.0",
-    "@types/node": "^22.0.0",
-    "jest": "^30.2.0",
-    "rimraf": "^6.0.1",
-    "typescript": "^5.9.3"
-  },
-  "dependencies": {
-    "@biomejs/biome": "^2.2.5"
-  }
+	"name": "lightpress",
+	"version": "2.0.0-alpha.1",
+	"description": "A thin composable HTTP handler interface around NodeJS native server listener.",
+	"type": "module",
+	"typings": "lib/index.d.ts",
+	"main": "lib/index.js",
+	"engines": {
+		"node": ">=22.0.0"
+	},
+	"scripts": {
+		"build": "rimraf ./lib && tsc",
+		"check-format": "biome check .",
+		"check-types": "tsc --noEmit",
+		"format": "biome check --write .",
+		"prepublishOnly": "npm run check-format && npm run test && npm run build",
+		"test": "jest"
+	},
+	"files": [
+		"lib/**/*"
+	],
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/lunsdorf/lightpress.git"
+	},
+	"keywords": [
+		"composable",
+		"express",
+		"http",
+		"lightpress",
+		"server"
+	],
+	"license": "MIT",
+	"author": "Lünsdorf <code@lunsdorf.com>",
+	"homepage": "https://github.com/lunsdorf/lightpress#readme",
+	"bugs": {
+		"url": "https://github.com/lunsdorf/lightpress/issues"
+	},
+	"devDependencies": {
+		"@swc/core": "^1.13.5",
+		"@swc/jest": "^0.2.39",
+		"@types/jest": "^30.0.0",
+		"@types/node": "^22.0.0",
+		"jest": "^30.2.0",
+		"rimraf": "^6.0.1",
+		"typescript": "^5.9.3"
+	},
+	"dependencies": {
+		"@biomejs/biome": "^2.2.5"
+	}
 }
