@@ -22,9 +22,8 @@ export type HttpResult =
 	  };
 
 /** An HTTP request handler that creates an {@link HttpResult}. */
-export type HttpHandler<T = undefined> = (
+export type HttpHandler = (
 	request: IncomingMessage,
-	context: T,
 ) => HttpResult | Promise<HttpResult>;
 
 /** A handler to recover from unhandled errors by the {@link HttpHandler}. */
@@ -33,7 +32,7 @@ export type RecoverHandler = (
 	error: unknown,
 ) => HttpResult | Promise<HttpResult>;
 
-/** Wraps an {@link HttpHandler} and returns an HTTP request listener. */
+/** Wraps an {@link HttpHandler} and returns a NodeJS request listener. */
 export function createRequestListener(
 	handler: HttpHandler,
 	recover?: RecoverHandler,
@@ -43,7 +42,7 @@ export function createRequestListener(
 	}
 
 	return (request: IncomingMessage, response: ServerResponse) =>
-		new Promise<HttpResult>((resolve) => resolve(handler(request, void 0)))
+		new Promise<HttpResult>((resolve) => resolve(handler(request)))
 			.catch((error) => {
 				// Instances of `HttpError` are send as response, all other error types
 				// are considered unhandled.

@@ -29,7 +29,7 @@ describe("createRequestListener()", () => {
 		await createRequestListener(handlerMock)(requestFixture, responseFixture);
 
 		expect(handlerMock).toHaveBeenCalledTimes(1);
-		expect(handlerMock).toHaveBeenCalledWith(requestFixture, undefined);
+		expect(handlerMock).toHaveBeenCalledWith(requestFixture);
 	});
 
 	it("calls `sendResult`", async () => {
