@@ -1,5 +1,5 @@
-const { Readable } = require("node:stream");
-const { sendResult } = require("./send-result");
+import { Readable } from "node:stream";
+import { sendResult } from "./send-result";
 
 describe("sendResult", () => {
 	const response = {
