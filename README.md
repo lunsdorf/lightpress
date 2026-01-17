@@ -1,181 +1,132 @@
 # lightpress
 
-Lightpress is a thin wrapper around node's HTTP request event and provides a
-composable HTTP handler interface.
+Lightpress is a thin wrapper around Node's HTTP request event, providing a composable HTTP handler interface.
 
 ## Installation
 
-You can install lightpress from [npmjs.com](https://www.npmjs.com/package/lightpress)
-using your favorite package manager, e.g.
-
 ```bash
-$ npm add lightpress
+npm add lightpress
 ```
 
-## Getting Started
+## Basic Usage
 
-In lightpress, an HTTP handler is a simple function that receives an HTTP
-request and returns a result.
+Create an HTTP handler function that receives a Node.js `IncomingMessage` and returns a result:
 
-```ts
+```js
 import { createServer } from "http";
-import createRequestListener from "lightpress";
+import { createRequestListener } from "lightpress";
 
 function greet(request) {
   return {
     statusCode: 200,
-    headers: {
-      "Content-Type": "text/plain",
-    },
+    headers: { "Content-Type": "text/plain" },
     body: `Hello from '${request.url}'.`,
   };
 }
 
-createServer(createRequestListener(greet)).listen(8080);
+createServer(
+  createRequestListener(greet)
+).listen(8080);
 ```
 
 ## Composing Handlers
 
-Putting everything into a single handler isn't sufficient. And the way
-lightpress solves this circumstance is by composing its handlers.
-
-Lets imagine, the `hello` handler from above must only be called for `GET`
-requests. To achieve this we could simply check the request method inside our
-`hello` handler. However, a better approach is to create a separate
-handler which only cares about request methods.
+You can compose handlers for more control. For example, you can restrict allowed HTTP methods.
 
 ```js
-import lightpress, { HttpError } from "lightpress";
-
-// ...
+import { HttpError } from "lightpress";
 
 function allowedMethods(methods, handler) {
-  return (context) => {
-    if (methods.includes(context.request.method)) {
-      return handler(context);
+  return (request) => {
+    if (methods.includes(request.method)) {
+      return handler(request);
     }
-
     throw new HttpError(405);
   };
 }
 
-// ...
-
-const server = createServer(lightpress(allowedMethods(["GET"], hello)));
+createServer(
+  createRequestListener(
+    allowedMethods(["GET"], greet)
+  )
+).listen(8080);
 ```
-
-The `allowedMethods` function is a factory that takes an array of allowed HTTP
-methods and a handler. It creates a new handler that will invoke the given one
-only if the method of the incoming request is included in the array of allowed
-methods. Otherwise, a `Method Not Allowed` error is thrown.
 
 ## Error Handling
 
-In lightpress, errors are handled using guards. A guard itself is just another
-handler that catches the error that was thrown from the inner handler and
-converts it to a result. As with any other handler, guards can be nested, giving
-you fine grained control on how the error flows.
+Lightpress supports flexible error handling at multiple levels. You can create special HTTP handlers that act as error guards. These guards allow you to control how specific parts of your handler tree respond to errors. For example, a guard around your rendering code could send errors as HTML, while a guard around your API could return JSON responses.
 
 ```js
-// ...
+import { HttpError } from "lightpress";
 
-function catchError(handler) {
-  return (context) =>
-    new Promise((resolve) => resolve(handler(context))).catch((error) => {
-      const statusCode = error instanceof HttpError ? error.statusCode : 500;
-      const message =
-        statusCode === 405 ? "Better watch your verbs." : "My bad.";
-      const body = Buffer.from(message);
-
-      return {
-        headers: {
-          "Content-Type": "text/plain",
-          "Content-Length": body.length,
-        },
-        statusCode,
-        body,
-      };
-    });
-}
-
-// ...
-
-const server = createServer(
-  lightpress(catchError(allowedMethods(["GET"], hello))),
-);
-```
-
-If an error is not handled, lightpress will catch it and send a basic error
-response without content.
-
-## Custom Data
-
-The context object that is passed to a handler can be augmented with custom
-data. Although it is technically possible to create a new copy of that context
-object whenever you pass it on to the next handler, you most likely won't need
-that. In fact, some 3rd-party packages might rely on using the same reference
-and could break when creating a copy.
-
-The recommended way to augement the context object, is by providing a handler
-function that manipulates the context object. And another function that savely
-returns the desired data from the context object. Or provides a fallback.
-
-The following function adds a simple `log` function to the context object.
-
-```js
-function injectLogger(handler) {
-  return (context) => {
-    const { method, url } = context.request;
-
-    context.log = (message) => `${new Date()} [${method} ${url}]: ${message}`;
-
-    return handler(context);
-  };
-}
-```
-
-The `log` function can be retrieved from the context using the following
-function.
-
-```js
-function extractLogger(context) {
-  if (context.log) {
-    return context.log;
+async function errorGuard(handler: HttpHandler) {
+  try {
+    return await handler(request);
+  } catch (error) {
+     // Handle the error and return a result or re-throw the error
+    // to be handled by an upper guard.
   }
-
-  console.warn("Trying to access logger, but was not injected.");
-
-  return () => void 0;
 }
 ```
 
-If no `log` function was injected into the context object, a warning is
-printed and a `noop`-fallback is return instead.
+Additionally, any `HttpError` that reaches Lightpress’s root handler is considered a handled error and will be sent as an HTTP response. The `HttpError` constructor can receive either a status code or a full `HttpResult` object.
 
 ```js
-//  ...
+// Only status code
+throw new HttpError(404);
 
-function hello(context) {
-  const log = extractLogger(context);
+// With full HTTP result
+throw new HttpError({
+  statusCode: 404,
+  headers: { "Content-Type": "text/plain" },
+  body: "Not found",
+});
+```
 
-  log("Serving request from hello handler.");
+Any other error is considered unexpected, and Lightpress will therefore respond with a generic `500` error. However, you can pass a `recover` function to `createRequestListener` as a second argument for global error handling.
+
+```js
+function recover(request, error) {
+  // Use this to run some cleanup code or do some logging.
 
   return {
-    statusCode: 200,
-    headers: {
-      "Content-Type": "text/plain",
-    },
-    body: `Hello from '${context.request.url}'.`,
+    statusCode: 500,
+    headers: { "Content-Type": "text/plain" },
+    body: "Internal Server Error",
   };
 }
 
-// ...
-
-const server = createServer(
-  lightpress(injectLogger(catchError(allowedMethods(["GET"], hello)))),
-);
+createServer(
+  createRequestListener(greet, recover)
+).listen(8080);
 ```
 
-Just like with error handlers, you have the exact same control when to extend
-the context object. This lets you for example inject a `user` right before your
-API handler is called, but ignore it for all sibling handlers.
+## Handler Factories
+
+In real-world applications, it’s common to provide an HTTP handler by using a configurable factory. A factory can receive options, such as a database connection or other configuration, and returns an HTTP handler. This helps to decouple infrastructure from business logic and allows for simpler code reuse.
+
+```js
+function createApiHandler({ db }) {
+  return async (request) => {
+    const data = await db.getSomeData();
+    
+    return {
+      statusCode: 200,
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    };
+  };
+}
+
+createServer(
+  createRequestListener(
+    createApiHandler({ db })
+  )
+).listen(8080);
+```
+
+## Custom Handler Types and Context
+
+Lightpress’s handler type is intentionally simple: it expects a function that receives a Node.js `IncomingMessage` and returns a result. Depending on your application, your HTTP handler may need additional request-related context, such as a timestamp, a user, or data that is expensive to retrieve. In this case, you will likely want to define your own handler type.
+
+_TODO: add example_
