@@ -4,5 +4,8 @@
 	"files": {
 		"includes": ["*.*", "!lib/"],
 		"ignoreUnknown": true
+	},
+	"formatter": {
+		"useEditorconfig": true
 	}
 }
