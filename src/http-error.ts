@@ -1,6 +1,6 @@
 import type { OutgoingHttpHeaders } from "node:http";
-import type { HttpResult } from "./create-request-listener";
 import { STATUS_CODES } from "node:http";
+import type { HttpResult } from "./create-request-listener";
 
 /** An error that can be send as an HTTP result. */
 export class HttpError extends Error implements NonNullable<HttpResult> {
