@@ -63,7 +63,7 @@ async function errorGuard(handler: HttpHandler) {
   try {
     return await handler(request);
   } catch (error) {
-     // Handle the error and return a result or re-throw the error
+    // Handle the error and return a result or re-throw the error
     // to be handled by an upper guard.
   }
 }
@@ -127,6 +127,6 @@ createServer(
 
 ## Custom Handler Types and Context
 
-Lightpress’s handler type is intentionally simple: it expects a function that receives a Node.js `IncomingMessage` and returns a result. Depending on your application, your HTTP handler may need additional request-related context, such as a timestamp, a user, or data that is expensive to retrieve. In this case, you will likely want to define your own handler type.
+Lightpress’s handler type is intentionally simple: it expects a function that receives a Node.js `IncomingMessage` and returns a result. Depending on your application, your HTTP handler may need additional request-related context, such as a timestamp, a user, or other data that might be expensive to compute. In this case, you will likely want to define your own handler type.
 
 _TODO: add example_
