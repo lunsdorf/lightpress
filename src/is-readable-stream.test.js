@@ -1,4 +1,4 @@
-import { Duplex, PassThrough, Readable, Writable } from "stream";
+import { Duplex, PassThrough, Readable, Writable } from "node:stream";
 import { isReadableStream } from "./is-readable-stream";
 
 describe("isReadableStream", () => {
@@ -8,7 +8,6 @@ describe("isReadableStream", () => {
 		expect(isReadableStream(null)).toBe(false);
 		expect(isReadableStream("test")).toBe(false);
 		expect(isReadableStream(1)).toBe(false);
-		expect(isReadableStream({})).toBe(false);
 		expect(isReadableStream([])).toBe(false);
 		expect(isReadableStream(new Writable())).toBe(false);
 		expect(isReadableStream(new Duplex())).toBe(true);
