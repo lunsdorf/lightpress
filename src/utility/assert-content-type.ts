@@ -1,5 +1,5 @@
 import type { IncomingHttpHeaders, IncomingMessage } from "node:http";
-import { HttpError } from "../http-error";
+import { HttpError } from "../http-error.ts";
 
 export function assertContentType<const TContentType extends string>(
 	request: IncomingMessage,

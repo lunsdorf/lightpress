@@ -1,8 +1,8 @@
 jest.mock("./send-result");
 
-import { createRequestListener } from "./create-request-listener";
-import { HttpError } from "./http-error";
-import { sendResult } from "./send-result";
+import { createRequestListener } from "./create-request-listener.ts";
+import { HttpError } from "./http-error.ts";
+import { sendResult } from "./send-result.ts";
 
 describe("createRequestListener()", () => {
 	let requestFixture = {};

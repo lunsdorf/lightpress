@@ -1,4 +1,4 @@
-import { createJsonResult } from "./create-json-result";
+import { createJsonResult } from "./create-json-result.ts";
 
 describe("createJsonResult", () => {
 	it("creates a JSON result", () => {

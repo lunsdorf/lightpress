@@ -1,6 +1,6 @@
 import type { ServerResponse } from "node:http";
-import type { HttpResult } from "./create-request-listener";
-import { isReadableStream } from "./is-readable-stream";
+import type { HttpResult } from "./create-request-listener.ts";
+import { isReadableStream } from "./is-readable-stream.ts";
 
 /** Passes the given {@link HttpResult} to the given {@link ServerResponse}. */
 export function sendResult(response: ServerResponse, result: HttpResult): void {

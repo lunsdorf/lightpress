@@ -129,4 +129,59 @@ createServer(
 
 Lightpress’s handler type is intentionally simple: it expects a function that receives a Node.js `IncomingMessage` and returns a result. Depending on your application, your HTTP handler may need additional request-related context, such as a timestamp, a user, or other data that might be expensive to compute. In this case, you will likely want to define your own handler type.
 
-_TODO: add example_
+The following TypeScript example illustrates a more real-world example on how to define and use an application-specific context.
+
+```ts
+import type { IncomingMessage } from "node:http";
+import type { HttpResult } from "lightpress";
+
+type AppContext = {
+	request: IncomingMessage;
+	user: MyAppUser;
+};
+
+// The full context is the default, while inner handlers can require a subset.
+type AppHandler<TContext extends Partial<AppContext> = AppContext> = (
+	context: TContext,
+) => Promise<HttpResult> | HttpResult;
+
+function createAppHandler(options: { db: Database; }) {
+	const api = createApiHandler(options.db);
+
+	return async (request: IncomingMessage) => {
+		// Constructing the context once per request should fit most applications.
+		// Depending on your needs, you could augment it further down the handler
+		// chain, allowing for fine-grained context distribution.
+		const user = await getUserSomehow(db, request);
+
+		const context: AppContext = {
+			request,
+			user,
+		};
+
+		// The full context satisfies a handler that requires only a subset of it.
+		return await api(context);
+	};
+}
+
+// Inner handlers might not need the entire application context. The generic
+// handler type lets each one declare only the data it needs, separating
+// concerns and making isolated testing easier.
+function createApiHandler(
+	db: Database,
+): AppHandler<Pick<AppContext, "user">> {
+	return async (context) => {
+		const data = await db.getSomeUserData(context.user);
+
+		return {
+			statusCode: 200,
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify(data),
+		};
+	};
+}
+
+createServer(
+	createRequestListener(createAppHandler({ db }))
+).listen(8080);
+```

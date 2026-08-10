@@ -1,5 +1,5 @@
 import type { IncomingMessage } from "node:http";
-import { HttpError } from "../http-error";
+import { HttpError } from "../http-error.ts";
 
 export async function consumeBody(
 	request: IncomingMessage,

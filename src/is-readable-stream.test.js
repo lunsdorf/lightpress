@@ -1,5 +1,5 @@
 import { Duplex, PassThrough, Readable, Writable } from "node:stream";
-import { isReadableStream } from "./is-readable-stream";
+import { isReadableStream } from "./is-readable-stream.ts";
 
 describe("isReadableStream", () => {
 	it("returns `true` when a readable stream was given", () => {

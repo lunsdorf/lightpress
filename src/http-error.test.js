@@ -1,5 +1,5 @@
 import { STATUS_CODES } from "node:http";
-import { HttpError } from "./http-error";
+import { HttpError } from "./http-error.ts";
 
 describe("HttpError", () => {
 	it("constructs to an instance of `Error`", () => {

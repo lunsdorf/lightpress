@@ -1,5 +1,5 @@
-import { HttpError } from "../http-error";
-import { assertContentType } from "./assert-content-type";
+import { HttpError } from "../http-error.ts";
+import { assertContentType } from "./assert-content-type.ts";
 
 describe("assertContentType", () => {
 	it("asserts a requests HTTP mthod", () => {

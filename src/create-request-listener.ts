@@ -3,8 +3,8 @@ import type {
 	OutgoingHttpHeaders,
 	ServerResponse,
 } from "node:http";
-import { HttpError } from "./http-error";
-import { sendResult } from "./send-result";
+import { HttpError } from "./http-error.ts";
+import { sendResult } from "./send-result.ts";
 
 /** An object that is used to be send as HTTP response. */
 export type HttpResult =

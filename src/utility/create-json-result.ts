@@ -1,11 +1,11 @@
 import type { OutgoingHttpHeaders } from "node:http";
-import type { HttpResult } from "../create-request-listener";
+import type { HttpResult } from "../create-request-listener.ts";
 
 const CONTENT_HEADER_RE = /^content-(?:type|length)$/i;
 
 export type JsonResultInit = {
-	statusCode: NonNullable<HttpResult>["statusCode"];
-	headers: NonNullable<HttpResult>["headers"];
+	statusCode?: NonNullable<HttpResult>["statusCode"];
+	headers?: NonNullable<HttpResult>["headers"];
 };
 
 export function createJsonResult(data: unknown, init?: JsonResultInit) {

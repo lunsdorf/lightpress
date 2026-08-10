@@ -1,5 +1,5 @@
 import { Readable } from "node:stream";
-import { sendResult } from "./send-result";
+import { sendResult } from "./send-result.ts";
 
 describe("sendResult", () => {
 	const response = {

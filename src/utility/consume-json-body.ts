@@ -1,6 +1,6 @@
 import type { IncomingMessage } from "node:http";
-import { HttpError } from "../http-error";
-import { consumeBody } from "./consume-body";
+import { HttpError } from "../http-error.ts";
+import { consumeBody } from "./consume-body.ts";
 
 export async function consumeJsonBody(
 	request: IncomingMessage,
