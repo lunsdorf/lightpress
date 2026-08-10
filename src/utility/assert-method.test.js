@@ -1,19 +1,25 @@
+import assert from "node:assert/strict";
+import { describe, it } from "node:test";
 import { HttpError } from "../http-error.ts";
 import { assertMethod } from "./assert-method.ts";
 
 describe("assertMethod", () => {
 	it("asserts a request HTTP method", () => {
-		expect(assertMethod({ method: "GET" }, "GET")).toBeUndefined();
+		assert.equal(assertMethod({ method: "GET" }, "GET"), undefined);
 	});
+
 	it("allows arbitrary HTTP methods", () => {
-		expect(assertMethod({ method: "SOMETHING" }, "SOMETHING")).toBeUndefined();
+		assert.equal(assertMethod({ method: "SOMETHING" }, "SOMETHING"), undefined);
 	});
+
 	it("throws an HttpError with code 405", () => {
-		expect(() => assertMethod({ method: "POST" }, "GET")).toThrow(
-			new HttpError(405),
+		assert.throws(
+			() => assertMethod({ method: "POST" }, "GET"),
+			(error) => error instanceof HttpError && error.statusCode === 405,
 		);
 	});
+
 	it("expects exact match", () => {
-		expect(() => assertMethod({ method: "GET" }, "get")).toThrow();
+		assert.throws(() => assertMethod({ method: "GET" }, "get"));
 	});
 });

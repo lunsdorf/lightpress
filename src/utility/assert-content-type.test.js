@@ -1,43 +1,52 @@
+import assert from "node:assert/strict";
+import { describe, it } from "node:test";
 import { HttpError } from "../http-error.ts";
 import { assertContentType } from "./assert-content-type.ts";
 
 describe("assertContentType", () => {
 	it("asserts a requests HTTP mthod", () => {
-		expect(
+		assert.equal(
 			assertContentType(
 				{ headers: { "content-type": "text/plain" } },
 				"text/plain",
 			),
-		).toBeUndefined();
+			undefined,
+		);
 	});
+
 	it("allows arbitrary content types", () => {
-		expect(
+		assert.equal(
 			assertContentType(
 				{ headers: { "content-type": "my/content" } },
 				"my/content",
 			),
-		).toBeUndefined();
+			undefined,
+		);
 	});
+
 	it("throws an HttpError with code 415", () => {
-		expect(() =>
-			assertContentType(
-				{ headers: { "content-type": "text/plain" } },
-				"text/html",
-			),
-		).toThrow(new HttpError(415));
+		assert.throws(
+			() =>
+				assertContentType(
+					{ headers: { "content-type": "text/plain" } },
+					"text/html",
+				),
+			(error) => error instanceof HttpError && error.statusCode === 415,
+		);
 	});
+
 	it("expects exact match", () => {
-		expect(() =>
+		assert.throws(() =>
 			assertContentType(
 				{ headers: { "content-type": "text/plain" } },
 				"TEXT/PLAIN",
 			),
-		).toThrow();
-		expect(() =>
+		);
+		assert.throws(() =>
 			assertContentType(
 				{ headers: { "content-type": "text/plain;charset=iso-8859-1" } },
 				"text/plain",
 			),
-		).toThrow();
+		);
 	});
 });

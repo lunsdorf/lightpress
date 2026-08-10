@@ -1,8 +1,10 @@
+import assert from "node:assert/strict";
+import { describe, it } from "node:test";
 import { createJsonResult } from "./create-json-result.ts";
 
 describe("createJsonResult", () => {
 	it("creates a JSON result", () => {
-		expect(createJsonResult({ greet: "world" })).toEqual({
+		assert.deepEqual(createJsonResult({ greet: "world" }), {
 			statusCode: 200,
 			headers: {
 				"content-type": "application/json",
@@ -11,41 +13,40 @@ describe("createJsonResult", () => {
 			body: Buffer.from(JSON.stringify({ greet: "world" })),
 		});
 	});
+
 	it("applies result initialization", () => {
-		expect(
+		assert.deepEqual(
 			createJsonResult(null, {
 				statusCode: 123,
 				headers: { "content-language": "en" },
 			}),
-		).toEqual({
-			statusCode: 123,
-			headers: {
-				"content-language": "en",
-				"content-type": "application/json",
-				"content-length": "4",
-			},
-			body: expect.any(Buffer),
-		});
-	});
-	it("overrides relevant content headers", () => {
-		expect(
-			createJsonResult(
-				{},
-				{
-					statusCode: 200,
-					headers: {
-						"CoNtEnt-TyPe": "text/html",
-						"content-length": 100,
-					},
-				},
-			),
-		).toEqual(
-			expect.objectContaining({
+			{
+				statusCode: 123,
 				headers: {
+					"content-language": "en",
 					"content-type": "application/json",
-					"content-length": "2",
+					"content-length": "4",
 				},
-			}),
+				body: Buffer.from(JSON.stringify(null)),
+			},
 		);
+	});
+
+	it("overrides relevant content headers", () => {
+		const result = createJsonResult(
+			{},
+			{
+				statusCode: 200,
+				headers: {
+					"CoNtEnt-TyPe": "text/html",
+					"content-length": 100,
+				},
+			},
+		);
+
+		assert.deepEqual(result.headers, {
+			"content-type": "application/json",
+			"content-length": "2",
+		});
 	});
 });

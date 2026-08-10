@@ -1,21 +1,24 @@
+import assert from "node:assert/strict";
 import { STATUS_CODES } from "node:http";
+import { describe, it } from "node:test";
 import { HttpError } from "./http-error.ts";
 
 describe("HttpError", () => {
 	it("constructs to an instance of `Error`", () => {
-		expect(new HttpError(400)).toBeInstanceOf(Error);
+		assert.ok(new HttpError(400) instanceof Error);
 	});
 
 	it("supports `cause`", () => {
 		const causeFixture = new Error("my fault");
 
-		expect(new HttpError(400, { cause: causeFixture }).cause).toBe(
+		assert.equal(
+			new HttpError(400, { cause: causeFixture }).cause,
 			causeFixture,
 		);
 	});
 
 	it("defaults to standard HTTP message", () => {
-		expect(new HttpError(400).message).toBe(STATUS_CODES[400]);
+		assert.equal(new HttpError(400).message, STATUS_CODES[400]);
 	});
 
 	it("supports construction from HTTP status code", () => {
@@ -23,9 +26,9 @@ describe("HttpError", () => {
 
 		const subject = new HttpError(statusCodeFixture);
 
-		expect(subject.statusCode).toBe(statusCodeFixture);
-		expect(subject.body).toBeUndefined();
-		expect(subject.headers).toBeUndefined();
+		assert.equal(subject.statusCode, statusCodeFixture);
+		assert.equal(subject.body, undefined);
+		assert.equal(subject.headers, undefined);
 	});
 
 	it("supports construction from HttpResult", () => {
@@ -39,16 +42,16 @@ describe("HttpError", () => {
 			body: bodyFixture,
 		});
 
-		expect(subject.statusCode).toBe(statusCodeFixture);
-		expect(subject.body).toBe(bodyFixture);
-		expect(subject.headers).toBe(headersFixture);
+		assert.equal(subject.statusCode, statusCodeFixture);
+		assert.equal(subject.body, bodyFixture);
+		assert.equal(subject.headers, headersFixture);
 	});
 
 	it("supports construction from empty HttpResult", () => {
 		const subject = new HttpError();
 
-		expect(subject.statusCode).toBe(500);
-		expect(subject.body).toBeUndefined();
-		expect(subject.headers).toBeUndefined();
+		assert.equal(subject.statusCode, 500);
+		assert.equal(subject.body, undefined);
+		assert.equal(subject.headers, undefined);
 	});
 });

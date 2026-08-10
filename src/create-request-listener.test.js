@@ -1,99 +1,107 @@
-jest.mock("./send-result");
-
+import assert from "node:assert/strict";
+import { describe, it } from "node:test";
 import { createRequestListener } from "./create-request-listener.ts";
 import { HttpError } from "./http-error.ts";
-import { sendResult } from "./send-result.ts";
+
+function createResponse(t) {
+	return {
+		statusCode: undefined,
+		writeHead: t.mock.fn(),
+		end: t.mock.fn(),
+	};
+}
+
+function assertResponse(response, statusCode, body = null) {
+	assert.equal(response.statusCode, statusCode);
+	assert.equal(response.writeHead.mock.callCount(), 0);
+	assert.equal(response.end.mock.callCount(), 1);
+	assert.deepEqual(response.end.mock.calls[0].arguments, [body]);
+}
 
 describe("createRequestListener()", () => {
-	let requestFixture = {};
-	let responseFixture = {};
-
-	afterEach(() => {
-		requestFixture = {};
-		responseFixture = {};
-
-		jest.resetAllMocks();
-	});
-
 	it("throws if no handler was given", () => {
-		expect(() => createRequestListener()).toThrow();
+		assert.throws(() => createRequestListener());
 	});
 
 	it("returns a function", () => {
-		expect(typeof createRequestListener(() => void 0)).toBe("function");
+		assert.equal(typeof createRequestListener(() => void 0), "function");
 	});
 
-	it("calls handler", async () => {
-		const handlerMock = jest.fn();
+	it("calls handler", async (t) => {
+		const request = {};
+		const response = createResponse(t);
+		const handlerMock = t.mock.fn();
 
-		await createRequestListener(handlerMock)(requestFixture, responseFixture);
+		await createRequestListener(handlerMock)(request, response);
 
-		expect(handlerMock).toHaveBeenCalledTimes(1);
-		expect(handlerMock).toHaveBeenCalledWith(requestFixture);
+		assert.equal(handlerMock.mock.callCount(), 1);
+		assert.deepEqual(handlerMock.mock.calls[0].arguments, [request]);
 	});
 
-	it("calls `sendResult`", async () => {
-		const resultFixture = {};
+	it("sends the handler result", async (t) => {
+		const response = createResponse(t);
 
-		await createRequestListener(() => resultFixture)(
-			requestFixture,
-			responseFixture,
-		);
+		await createRequestListener(() => ({
+			statusCode: 201,
+			body: "created",
+		}))({}, response);
 
-		expect(sendResult).toHaveBeenCalledTimes(1);
-		expect(sendResult).toHaveBeenCalledWith(responseFixture, resultFixture);
+		assertResponse(response, 201, "created");
 	});
 
-	it("supports async results", async () => {
-		const resultFixture = {};
+	it("supports async results", async (t) => {
+		const response = createResponse(t);
 
-		await createRequestListener(() => Promise.resolve(resultFixture))(
-			requestFixture,
-			responseFixture,
-		);
+		await createRequestListener(() =>
+			Promise.resolve({ statusCode: 201, body: "created" }),
+		)({}, response);
 
-		expect(sendResult).toHaveBeenCalledTimes(1);
-		expect(sendResult).toHaveBeenCalledWith(responseFixture, resultFixture);
+		assertResponse(response, 201, "created");
 	});
 
-	it("sends `HttpError` as result", async () => {
+	it("sends `HttpError` as result", async (t) => {
+		const response = createResponse(t);
 		const errorFixture = new HttpError(400);
 
 		await createRequestListener(() => {
 			throw errorFixture;
-		})(requestFixture, responseFixture);
+		})({}, response);
 
-		expect(sendResult).toHaveBeenCalledTimes(1);
-		expect(sendResult).toHaveBeenCalledWith(responseFixture, errorFixture);
+		assertResponse(response, 400);
 	});
 
-	it("supports async `HttpError` as result", async () => {
+	it("supports async `HttpError` as result", async (t) => {
+		const response = createResponse(t);
 		const errorFixture = new HttpError(400);
 
 		await createRequestListener(() => Promise.reject(errorFixture))(
-			requestFixture,
-			responseFixture,
+			{},
+			response,
 		);
 
-		expect(sendResult).toHaveBeenCalledTimes(1);
-		expect(sendResult).toHaveBeenCalledWith(responseFixture, errorFixture);
+		assertResponse(response, 400);
 	});
 
-	it("calls recover handler for unhandled errors", async () => {
+	it("calls recover handler for unhandled errors", async (t) => {
+		const request = {};
+		const response = createResponse(t);
 		const errorFixture = new Error("Oh no!");
-		const recoverFixture = {};
-		const recoverMock = jest.fn(() => recoverFixture);
+		const recoverMock = t.mock.fn(() => ({ statusCode: 204 }));
 
 		await createRequestListener(() => {
 			throw errorFixture;
-		}, recoverMock)(requestFixture, responseFixture);
+		}, recoverMock)(request, response);
 
-		expect(recoverMock).toHaveBeenCalledWith(requestFixture, errorFixture);
-		expect(sendResult).toHaveBeenCalledWith(responseFixture, recoverFixture);
+		assert.deepEqual(recoverMock.mock.calls[0].arguments, [
+			request,
+			errorFixture,
+		]);
+		assertResponse(response, 204);
 	});
 
-	it("sends result from recovered unhandled error", async () => {
-		const errorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
+	it("sends result from recovered unhandled error", async (t) => {
+		const response = createResponse(t);
+		const errorSpy = t.mock.method(console, "error", () => {});
 		const errorFixture = new Error("Oh no!");
 		const recoverFixture = { statusCode: 404 };
 
@@ -102,28 +110,30 @@ describe("createRequestListener()", () => {
 				throw errorFixture;
 			},
 			() => recoverFixture,
-		)(requestFixture, responseFixture);
+		)({}, response);
 
-		expect(errorSpy).not.toHaveBeenCalledWith(errorFixture);
-		expect(sendResult).toHaveBeenCalledWith(responseFixture, recoverFixture);
+		assert.equal(errorSpy.mock.callCount(), 0);
+		assertResponse(response, 404);
 	});
 
-	it("sends result from recovered unhandled async error", async () => {
-		const errorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
+	it("sends result from recovered unhandled async error", async (t) => {
+		const response = createResponse(t);
+		const errorSpy = t.mock.method(console, "error", () => {});
 		const errorFixture = new Error("Oh no!");
 		const recoverFixture = { statusCode: 404 };
 
 		await createRequestListener(
 			() => Promise.reject(errorFixture),
 			() => recoverFixture,
-		)(requestFixture, responseFixture);
+		)({}, response);
 
-		expect(errorSpy).not.toHaveBeenCalledWith(errorFixture);
-		expect(sendResult).toHaveBeenCalledWith(responseFixture, recoverFixture);
+		assert.equal(errorSpy.mock.callCount(), 0);
+		assertResponse(response, 404);
 	});
 
-	it("sends status 500 if recover handler throws an error", async () => {
-		const errorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
+	it("sends status 500 if recover handler throws an error", async (t) => {
+		const response = createResponse(t);
+		const errorSpy = t.mock.method(console, "error", () => {});
 		const errorFixture = new Error("Oh no!");
 		const recoverErrorFixture = new Error("Not again!");
 
@@ -132,56 +142,51 @@ describe("createRequestListener()", () => {
 			() => {
 				throw recoverErrorFixture;
 			},
-		)(requestFixture, responseFixture);
+		)({}, response);
 
-		expect(errorSpy).toHaveBeenCalledWith(recoverErrorFixture);
-		expect(sendResult).toHaveBeenCalledWith(responseFixture, {
-			statusCode: 500,
-		});
+		assert.deepEqual(errorSpy.mock.calls[0].arguments, [recoverErrorFixture]);
+		assertResponse(response, 500);
 	});
 
-	it("sends status 500 if recover handler throws an error async", async () => {
-		const errorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
+	it("sends status 500 if recover handler throws an error async", async (t) => {
+		const response = createResponse(t);
+		const errorSpy = t.mock.method(console, "error", () => {});
 		const errorFixture = new Error("Oh no!");
 		const recoverErrorFixture = new Error("Not again!");
 
 		await createRequestListener(
 			() => Promise.reject(errorFixture),
 			() => Promise.reject(recoverErrorFixture),
-		)(requestFixture, responseFixture);
+		)({}, response);
 
-		expect(errorSpy).toHaveBeenCalledWith(recoverErrorFixture);
-		expect(sendResult).toHaveBeenCalledWith(responseFixture, {
-			statusCode: 500,
-		});
+		assert.deepEqual(errorSpy.mock.calls[0].arguments, [recoverErrorFixture]);
+		assertResponse(response, 500);
 	});
 
-	it("sends status 500 for unhandled errors without recover handler", async () => {
-		const errorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
+	it("sends status 500 for unhandled errors without recover handler", async (t) => {
+		const response = createResponse(t);
+		const errorSpy = t.mock.method(console, "error", () => {});
 		const errorFixture = new Error("Oh no!");
 
 		await createRequestListener(() => {
 			throw errorFixture;
-		})(requestFixture, responseFixture);
+		})({}, response);
 
-		expect(errorSpy).toHaveBeenCalledWith(errorFixture);
-		expect(sendResult).toHaveBeenCalledWith(responseFixture, {
-			statusCode: 500,
-		});
+		assert.deepEqual(errorSpy.mock.calls[0].arguments, [errorFixture]);
+		assertResponse(response, 500);
 	});
 
-	it("sends status 500 for unhandled async errors without recover handler", async () => {
-		const errorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
+	it("sends status 500 for unhandled async errors without recover handler", async (t) => {
+		const response = createResponse(t);
+		const errorSpy = t.mock.method(console, "error", () => {});
 		const errorFixture = new Error("Oh no!");
 
 		await createRequestListener(() => Promise.reject(errorFixture))(
-			requestFixture,
-			responseFixture,
+			{},
+			response,
 		);
 
-		expect(errorSpy).toHaveBeenCalledWith(errorFixture);
-		expect(sendResult).toHaveBeenCalledWith(responseFixture, {
-			statusCode: 500,
-		});
+		assert.deepEqual(errorSpy.mock.calls[0].arguments, [errorFixture]);
+		assertResponse(response, 500);
 	});
 });
