@@ -20,7 +20,8 @@
 		"node": ">=24.0.0"
 	},
 	"scripts": {
-		"build": "rimraf ./lib && tsc",
+		"prebuild": "node -e \"require('node:fs').rmSync('lib', { recursive: true, force: true })\"",
+		"build": "tsc",
 		"check-format": "biome check .",
 		"check-types": "tsc --noEmit",
 		"format": "biome check --write .",
@@ -51,7 +52,6 @@
 	"devDependencies": {
 		"@biomejs/biome": "^2.3.14",
 		"@types/node": "^24.10.13",
-		"rimraf": "^6.1.2",
 		"typescript": "^7.0.2"
 	}
 }
