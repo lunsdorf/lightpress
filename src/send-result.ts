@@ -1,6 +1,6 @@
 import type { ServerResponse } from "node:http";
+import { Readable } from "node:stream";
 import type { HttpResult } from "./create-request-listener.ts";
-import { isReadableStream } from "./is-readable-stream.ts";
 
 /** Passes the given {@link HttpResult} to the given {@link ServerResponse}. */
 export function sendResult(response: ServerResponse, result: HttpResult): void {
@@ -12,7 +12,7 @@ export function sendResult(response: ServerResponse, result: HttpResult): void {
 		response.statusCode = statusCode;
 	}
 
-	if (isReadableStream(result?.body)) {
+	if (result?.body instanceof Readable) {
 		result.body.pipe(response);
 	} else {
 		response.end(result?.body ?? null);
