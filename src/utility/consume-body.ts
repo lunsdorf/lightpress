@@ -12,7 +12,7 @@ export async function consumeBody(
 		chunks.push(chunk);
 		chunksBytes = chunksBytes + chunk.byteLength;
 
-		if (maxByteLength && chunksBytes > maxByteLength) {
+		if (typeof maxByteLength === "number" && chunksBytes > maxByteLength) {
 			chunks.length = 0;
 			chunksBytes = 0;
 
