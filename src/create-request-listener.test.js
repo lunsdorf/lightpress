@@ -82,88 +82,7 @@ describe("createRequestListener()", () => {
 		assertResponse(response, 400);
 	});
 
-	it("calls recover handler for unhandled errors", async (t) => {
-		const request = {};
-		const response = createResponse(t);
-		const errorFixture = new Error("Oh no!");
-		const recoverMock = t.mock.fn(() => ({ statusCode: 204 }));
-
-		await createRequestListener(() => {
-			throw errorFixture;
-		}, recoverMock)(request, response);
-
-		assert.deepEqual(recoverMock.mock.calls[0].arguments, [
-			request,
-			errorFixture,
-		]);
-		assertResponse(response, 204);
-	});
-
-	it("sends result from recovered unhandled error", async (t) => {
-		const response = createResponse(t);
-		const errorSpy = t.mock.method(console, "error", () => {});
-		const errorFixture = new Error("Oh no!");
-		const recoverFixture = { statusCode: 404 };
-
-		await createRequestListener(
-			() => {
-				throw errorFixture;
-			},
-			() => recoverFixture,
-		)({}, response);
-
-		assert.equal(errorSpy.mock.callCount(), 0);
-		assertResponse(response, 404);
-	});
-
-	it("sends result from recovered unhandled async error", async (t) => {
-		const response = createResponse(t);
-		const errorSpy = t.mock.method(console, "error", () => {});
-		const errorFixture = new Error("Oh no!");
-		const recoverFixture = { statusCode: 404 };
-
-		await createRequestListener(
-			() => Promise.reject(errorFixture),
-			() => recoverFixture,
-		)({}, response);
-
-		assert.equal(errorSpy.mock.callCount(), 0);
-		assertResponse(response, 404);
-	});
-
-	it("sends status 500 if recover handler throws an error", async (t) => {
-		const response = createResponse(t);
-		const errorSpy = t.mock.method(console, "error", () => {});
-		const errorFixture = new Error("Oh no!");
-		const recoverErrorFixture = new Error("Not again!");
-
-		await createRequestListener(
-			() => Promise.reject(errorFixture),
-			() => {
-				throw recoverErrorFixture;
-			},
-		)({}, response);
-
-		assert.deepEqual(errorSpy.mock.calls[0].arguments, [recoverErrorFixture]);
-		assertResponse(response, 500);
-	});
-
-	it("sends status 500 if recover handler throws an error async", async (t) => {
-		const response = createResponse(t);
-		const errorSpy = t.mock.method(console, "error", () => {});
-		const errorFixture = new Error("Oh no!");
-		const recoverErrorFixture = new Error("Not again!");
-
-		await createRequestListener(
-			() => Promise.reject(errorFixture),
-			() => Promise.reject(recoverErrorFixture),
-		)({}, response);
-
-		assert.deepEqual(errorSpy.mock.calls[0].arguments, [recoverErrorFixture]);
-		assertResponse(response, 500);
-	});
-
-	it("sends status 500 for unhandled errors without recover handler", async (t) => {
+	it("sends status 500 for unhandled errors", async (t) => {
 		const response = createResponse(t);
 		const errorSpy = t.mock.method(console, "error", () => {});
 		const errorFixture = new Error("Oh no!");
@@ -176,7 +95,7 @@ describe("createRequestListener()", () => {
 		assertResponse(response, 500);
 	});
 
-	it("sends status 500 for unhandled async errors without recover handler", async (t) => {
+	it("sends status 500 for unhandled async errors", async (t) => {
 		const response = createResponse(t);
 		const errorSpy = t.mock.method(console, "error", () => {});
 		const errorFixture = new Error("Oh no!");

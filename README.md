@@ -54,22 +54,33 @@ createServer(
 
 ## Error Handling
 
-Lightpress supports flexible error handling at multiple levels. You can create special HTTP handlers that act as error guards. These guards allow you to control how specific parts of your handler tree respond to errors. For example, a guard around your rendering code could send errors as HTML, while a guard around your API could return JSON responses.
+Lightpress supports flexible error handling at multiple levels. You can create special HTTP handlers that act as error boundaries. These boundaries allow you to control how specific parts of your handler tree respond to errors. For example, a boundary around your rendering code could send errors as HTML, while a boundary around your API could return JSON responses.
 
 ```js
-import { HttpError } from "lightpress";
-
-async function errorGuard(handler: HttpHandler) {
-  try {
-    return await handler(request);
-  } catch (error) {
-    // Handle the error and return a result or re-throw the error
-    // to be handled by an upper guard.
-  }
+function errorBoundary(handler) {
+  return async (request) => {
+    try {
+      return await handler(request);
+    } catch (error) {
+      // Handle the error and return a result, or rethrow the error
+      // to be handled by an outer boundary.
+    }
+  };
 }
 ```
 
-Additionally, any `HttpError` that reaches Lightpress’s root handler is considered a handled error and will be sent as an HTTP response. The `HttpError` constructor can receive either a status code or a full `HttpResult` object.
+To reduce the amount of boilerplate code, Lightpress provides a `withErrorBoundary` utility function. Its error handler receives every error followed by the original handler arguments. It can return an alternative result or rethrow the error to an outer boundary. Since `withErrorBoundary` is generic over its arguments, it also supports [custom handler types and context](#custom-handler-types-and-context).
+
+```js
+import { withErrorBoundary } from "lightpress/utility";
+
+const handler = withErrorBoundary(myHandler, (error, request) => {
+  // Handle the error and return a result, or rethrow the error
+  // to be handled by an outer boundary.
+});
+```
+
+Any `HttpError` that reaches Lightpress’s root handler is considered a handled error and will be sent as an HTTP response. The `HttpError` constructor can receive either a status code or a full `HttpResult` object.
 
 ```js
 // Only status code
@@ -83,23 +94,7 @@ throw new HttpError({
 });
 ```
 
-Any other error is considered unexpected, and Lightpress will therefore respond with a generic `500` error. However, you can pass a `recover` function to `createRequestListener` as a second argument for global error handling.
-
-```js
-function recover(request, error) {
-  // Use this to run some cleanup code or do some logging.
-
-  return {
-    statusCode: 500,
-    headers: { "Content-Type": "text/plain" },
-    body: "Internal Server Error",
-  };
-}
-
-createServer(
-  createRequestListener(greet, recover)
-).listen(8080);
-```
+Any other error is considered unexpected, and Lightpress will therefore respond with a generic `500` error.
 
 ## Handler Factories
 
