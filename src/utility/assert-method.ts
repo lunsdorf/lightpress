@@ -6,6 +6,6 @@ export function assertMethod<const TMethod extends string>(
 	method: TMethod,
 ): asserts request is IncomingMessage & { method: TMethod } {
 	if (request.method !== method) {
-		throw new HttpError(405);
+		throw new HttpError({ statusCode: 405, headers: { allow: method } });
 	}
 }
