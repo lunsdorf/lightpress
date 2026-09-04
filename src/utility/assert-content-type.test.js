@@ -35,18 +35,20 @@ describe("assertContentType", () => {
 		);
 	});
 
-	it("expects exact match", () => {
-		assert.throws(() =>
-			assertContentType(
-				{ headers: { "content-type": "text/plain" } },
-				"TEXT/PLAIN",
-			),
-		);
-		assert.throws(() =>
-			assertContentType(
-				{ headers: { "content-type": "text/plain;charset=iso-8859-1" } },
-				"text/plain",
-			),
-		);
+	it("compares normalized media-type essences", () => {
+		for (const [incomingContentType, assertedContentType] of [
+			["TEXT/PLAIN", "text/plain"],
+			["text/plain", "text/plain;charset=iso-8859-1"],
+			["text/plain;charset=iso-8859-1", " Text/Plain "],
+			[" Text/Plain ; charset=utf-8", "TEXT/PLAIN"],
+		]) {
+			assert.equal(
+				assertContentType(
+					{ headers: { "content-type": incomingContentType } },
+					assertedContentType,
+				),
+				undefined,
+			);
+		}
 	});
 });
