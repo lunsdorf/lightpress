@@ -50,5 +50,12 @@ export function createRequestListener(
 
 				return { statusCode: 500 };
 			})
-			.then((result) => sendResult(response, result));
+			.then((result) => sendResult(response, result))
+			.catch((error) => {
+				console.error(error);
+
+				// Headers or part of the body may have already been delivered. The
+				// connection is closed without attempting another response.
+				response.destroy();
+			});
 }

@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { Readable } from "node:stream";
+import { Readable, Writable } from "node:stream";
 import { describe, it } from "node:test";
 import { sendResult } from "./send-result.ts";
 
@@ -12,32 +12,32 @@ function createResponse(t) {
 }
 
 describe("sendResult", () => {
-	it("sends defaults", (t) => {
+	it("sends defaults", async (t) => {
 		const response = createResponse(t);
 
-		sendResult(response, null);
+		await sendResult(response, null);
 
 		assert.equal(response.statusCode, 200);
 		assert.equal(response.writeHead.mock.callCount(), 0);
 		assert.deepEqual(response.end.mock.calls[0].arguments, [null]);
 	});
 
-	it("sends status code", (t) => {
+	it("sends status code", async (t) => {
 		const response = createResponse(t);
 		const statusCodeFixture = 400;
 
-		sendResult(response, { statusCode: statusCodeFixture });
+		await sendResult(response, { statusCode: statusCodeFixture });
 
 		assert.equal(response.statusCode, statusCodeFixture);
 		assert.equal(response.writeHead.mock.callCount(), 0);
 		assert.deepEqual(response.end.mock.calls[0].arguments, [null]);
 	});
 
-	it("sends headers", (t) => {
+	it("sends headers", async (t) => {
 		const response = createResponse(t);
 		const headersFixture = {};
 
-		sendResult(response, { headers: headersFixture });
+		await sendResult(response, { headers: headersFixture });
 
 		assert.equal(response.statusCode, undefined);
 		assert.deepEqual(response.writeHead.mock.calls[0].arguments, [
@@ -47,12 +47,12 @@ describe("sendResult", () => {
 		assert.deepEqual(response.end.mock.calls[0].arguments, [null]);
 	});
 
-	it("sends headers and status code", (t) => {
+	it("sends headers and status code", async (t) => {
 		const response = createResponse(t);
 		const statusCodeFixture = 400;
 		const headersFixture = {};
 
-		sendResult(response, {
+		await sendResult(response, {
 			statusCode: statusCodeFixture,
 			headers: headersFixture,
 		});
@@ -65,39 +65,101 @@ describe("sendResult", () => {
 		assert.deepEqual(response.end.mock.calls[0].arguments, [null]);
 	});
 
-	it("sends body string", (t) => {
+	it("sends body string", async (t) => {
 		const response = createResponse(t);
 		const bodyFixture = "Hello World!";
 
-		sendResult(response, { body: bodyFixture });
+		await sendResult(response, { body: bodyFixture });
 
 		assert.equal(response.statusCode, 200);
 		assert.equal(response.writeHead.mock.callCount(), 0);
 		assert.deepEqual(response.end.mock.calls[0].arguments, [bodyFixture]);
 	});
 
-	it("sends body buffer", (t) => {
+	it("sends body buffer", async (t) => {
 		const response = createResponse(t);
 		const bodyFixture = Buffer.from("Hello World!");
 
-		sendResult(response, { body: bodyFixture });
+		await sendResult(response, { body: bodyFixture });
 
 		assert.equal(response.statusCode, 200);
 		assert.equal(response.writeHead.mock.callCount(), 0);
 		assert.deepEqual(response.end.mock.calls[0].arguments, [bodyFixture]);
 	});
 
-	it("sends body stream", (t) => {
-		const response = createResponse(t);
-		const bodyFixture = new Readable();
+	it("sends the entire body stream before resolving", async () => {
+		const chunks = [];
+		const response = new Writable({
+			write(chunk, _encoding, callback) {
+				setImmediate(() => {
+					chunks.push(chunk);
+					callback();
+				});
+			},
+		});
 
-		bodyFixture.pipe = t.mock.fn();
-
-		sendResult(response, { body: bodyFixture });
+		await sendResult(response, { body: Readable.from(["Hello", " World!"]) });
 
 		assert.equal(response.statusCode, 200);
-		assert.equal(response.writeHead.mock.callCount(), 0);
-		assert.equal(response.end.mock.callCount(), 0);
-		assert.deepEqual(bodyFixture.pipe.mock.calls[0].arguments, [response]);
+		assert.equal(Buffer.concat(chunks).toString(), "Hello World!");
+		assert.equal(response.writableFinished, true);
+	});
+
+	it("rejects and destroys the response when the body stream fails", async () => {
+		const errorFixture = new Error("body stream failed");
+		const body = new Readable({
+			read() {
+				setImmediate(() => this.destroy(errorFixture));
+			},
+		});
+		const response = new Writable({
+			write(_chunk, _encoding, callback) {
+				callback();
+			},
+		});
+
+		await assert.rejects(sendResult(response, { body }), errorFixture);
+
+		assert.equal(body.destroyed, true);
+		assert.equal(response.destroyed, true);
+	});
+
+	it("rejects and destroys the body when the response stream fails", async () => {
+		const errorFixture = new Error("response stream failed");
+		const body = new Readable({
+			read() {
+				this.push("body");
+			},
+		});
+		const response = new Writable({
+			write(_chunk, _encoding, callback) {
+				callback(errorFixture);
+			},
+		});
+
+		await assert.rejects(sendResult(response, { body }), errorFixture);
+
+		assert.equal(body.destroyed, true);
+		assert.equal(response.destroyed, true);
+	});
+
+	it("rejects and destroys the body when the response closes prematurely", async () => {
+		const body = new Readable({
+			read() {
+				this.push("body");
+			},
+		});
+		const response = new Writable({
+			write() {
+				this.destroy();
+			},
+		});
+
+		await assert.rejects(sendResult(response, { body }), {
+			code: "ERR_STREAM_PREMATURE_CLOSE",
+		});
+
+		assert.equal(body.destroyed, true);
+		assert.equal(response.destroyed, true);
 	});
 });

@@ -1,9 +1,13 @@
 import type { ServerResponse } from "node:http";
 import { Readable } from "node:stream";
+import { pipeline } from "node:stream/promises";
 import type { HttpResult } from "./create-request-listener.ts";
 
 /** Passes the given {@link HttpResult} to the given {@link ServerResponse}. */
-export function sendResult(response: ServerResponse, result: HttpResult): void {
+export async function sendResult(
+	response: ServerResponse,
+	result: HttpResult,
+): Promise<void> {
 	const statusCode = result?.statusCode ?? 200;
 
 	if (result?.headers) {
@@ -13,7 +17,7 @@ export function sendResult(response: ServerResponse, result: HttpResult): void {
 	}
 
 	if (result?.body instanceof Readable) {
-		result.body.pipe(response);
+		await pipeline(result.body, response);
 	} else {
 		response.end(result?.body ?? null);
 	}

@@ -94,7 +94,9 @@ throw new HttpError({
 });
 ```
 
-Any other error is considered unexpected, and Lightpress will therefore respond with a generic `500` error.
+Any other error from a handler is considered unexpected, and Lightpress will therefore respond with a generic `500` error.
+
+If sending the response fail for technical reasons, the error is logged and the response destroyed. Lightpress does not try to send another response, since headers or part of the body may have been sent already.
 
 ## Handler Factories
 
