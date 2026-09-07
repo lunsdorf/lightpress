@@ -4,7 +4,7 @@ import { consumeBody } from "./consume-body.ts";
 
 export async function consumeJsonBody(
 	request: IncomingMessage,
-	maxByteLength?: number,
+	maxByteLength = 1024 * 1024,
 ) {
 	const buffer = await consumeBody(request, maxByteLength);
 

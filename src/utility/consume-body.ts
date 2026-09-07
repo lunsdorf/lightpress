@@ -3,8 +3,12 @@ import { HttpError } from "../http-error.ts";
 
 export async function consumeBody(
 	request: IncomingMessage,
-	maxByteLength?: number,
+	maxByteLength: number,
 ) {
+	if (maxByteLength === undefined || maxByteLength === null) {
+		throw new TypeError("maxByteLength is required");
+	}
+
 	const chunks: Buffer[] = [];
 	let chunksBytes = 0;
 
@@ -12,7 +16,7 @@ export async function consumeBody(
 		chunks.push(chunk);
 		chunksBytes = chunksBytes + chunk.byteLength;
 
-		if (typeof maxByteLength === "number" && chunksBytes > maxByteLength) {
+		if (chunksBytes > maxByteLength) {
 			chunks.length = 0;
 			chunksBytes = 0;
 
