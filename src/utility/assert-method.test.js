@@ -15,7 +15,17 @@ describe("assertMethod", () => {
 	it("throws an HttpError with code 405", () => {
 		assert.throws(
 			() => assertMethod({ method: "POST" }, "GET"),
-			(error) => error instanceof HttpError && error.statusCode === 405,
+			(error) => error.statusCode === 405,
+		);
+	});
+
+	it("throws an HttpError with 'Allow' HTTP header", () => {
+		const methodFixture = "GET";
+
+		assert.throws(
+			() => assertMethod({ method: "POST" }, methodFixture),
+			(error) =>
+				error instanceof HttpError && error?.headers?.allow === methodFixture,
 		);
 	});
 

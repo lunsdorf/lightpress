@@ -3,6 +3,7 @@ import type {
 	OutgoingHttpHeaders,
 	ServerResponse,
 } from "node:http";
+import type { Readable } from "node:stream";
 import { HttpError } from "./http-error.ts";
 import { sendResult } from "./send-result.ts";
 
@@ -15,7 +16,7 @@ export type HttpResult =
 			statusCode?: null | number;
 
 			/** Optional response body. */
-			body?: null | string | Buffer | NodeJS.ReadableStream;
+			body?: null | string | Buffer | Readable;
 
 			/** Optional HTTP response headers. */
 			headers?: null | OutgoingHttpHeaders;

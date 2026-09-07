@@ -9,11 +9,21 @@ function createRequest(...chunks) {
 }
 
 describe("consumeBody", () => {
-	it("requires a maximum byte length", async () => {
-		await assert.rejects(consumeBody(createRequest("body")), {
-			name: "TypeError",
-			message: "maxByteLength is required",
-		});
+	it("rejects invalid maximum byte lengths", async () => {
+		for (const maxByteLength of [
+			undefined,
+			null,
+			Number.NaN,
+			-1,
+			1.5,
+			Number.MAX_SAFE_INTEGER + 1,
+			"123",
+		]) {
+			await assert.rejects(consumeBody(createRequest("body"), maxByteLength), {
+				name: "TypeError",
+				message: "maxByteLength must be a non-negative integer",
+			});
+		}
 	});
 
 	it("rejects a non-empty body when the maximum byte length is zero", async () => {

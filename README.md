@@ -41,7 +41,12 @@ function allowedMethods(methods, handler) {
     if (methods.includes(request.method)) {
       return handler(request);
     }
-    throw new HttpError(405);
+    throw new HttpError({
+    	statusCode: 405,
+    	headers: {
+     		Allow: methods.join(", ")
+	    }
+    });
   };
 }
 

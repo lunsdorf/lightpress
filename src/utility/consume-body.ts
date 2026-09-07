@@ -5,8 +5,8 @@ export async function consumeBody(
 	request: IncomingMessage,
 	maxByteLength: number,
 ) {
-	if (maxByteLength === undefined || maxByteLength === null) {
-		throw new TypeError("maxByteLength is required");
+	if (!Number.isSafeInteger(maxByteLength) || maxByteLength < 0) {
+		throw new TypeError("maxByteLength must be a non-negative integer");
 	}
 
 	const chunks: Buffer[] = [];

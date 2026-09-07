@@ -1,5 +1,6 @@
 import type { OutgoingHttpHeaders } from "node:http";
 import { STATUS_CODES } from "node:http";
+import type { Readable } from "node:stream";
 import type { HttpResult } from "./create-request-listener.ts";
 
 /** An error that can be send as an HTTP result. */
@@ -7,7 +8,7 @@ export class HttpError extends Error implements NonNullable<HttpResult> {
 	name: string = "HttpError";
 
 	statusCode: number;
-	body?: null | string | Buffer | NodeJS.ReadableStream;
+	body?: null | string | Buffer | Readable;
 	headers?: null | OutgoingHttpHeaders;
 
 	constructor(result: HttpResult, options?: ErrorOptions);
