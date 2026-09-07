@@ -1,6 +1,6 @@
 {
 	"name": "lightpress",
-	"version": "2.0.0-beta.3",
+	"version": "2.0.0-beta.4",
 	"description": "A thin composable HTTP handler interface around NodeJS native server listener.",
 	"type": "module",
 	"main": "./lib/index.js",
