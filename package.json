@@ -50,7 +50,7 @@
 		"url": "https://github.com/lunsdorf/lightpress/issues"
 	},
 	"devDependencies": {
-		"@biomejs/biome": "^2.3.14",
+		"@biomejs/biome": "^2.5.12",
 		"@types/node": "^24.10.13",
 		"typescript": "^7.0.2"
 	}
